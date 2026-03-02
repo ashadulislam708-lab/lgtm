@@ -1,0 +1,4 @@
+[submodule ".claude/nestjs"]
+	path = .claude/nestjs
+	url = https://github.com/potentialInc/claude-nestjs.git
+	branch = main
