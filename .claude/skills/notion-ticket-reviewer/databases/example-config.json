@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Example Bug Report database configuration. Copy and customize for your project.",
+
+  "id": "[YOUR_DATABASE_ID]",
+  "name": "Bug Report",
+  "description": "Track bugs, issues, and feature requests",
+
+  "properties": {
+    "title": "Title",
+    "status": "Status",
+    "priority": "Priority",
+    "type": "Type",
+    "app": "App / Dashboard",
+    "pages": "Pages",
+    "description": "Description",
+    "devComment": "Dev's Comment",
+    "reportedBy": "Reported by",
+    "doneBy": "Done by",
+    "responsibleFor": "Responsible for",
+    "difficulty": "Difficulty",
+    "attachments": "Image, Video",
+    "dueDate": "Due Date",
+    "createdTime": "Created time"
+  },
+
+  "statusValues": {
+    "todo": ["Need Urgent Fix", "New"],
+    "inProgress": ["Checked", "In Progress", "Need to discuss", "Client Rejected", "Test Failed"],
+    "done": ["Not Bug", "Ready for test", "Test Done"]
+  },
+
+  "priorityValues": ["0. Highest", "1. High", "2. Medium", "3. Low"],
+
+  "typeValues": ["Bug", "Feature", "Improvement", "Task"],
+
+  "appValues": ["<customize-for-your-project>"],
+
+  "workflowMapping": {
+    "start": "In Progress",
+    "complete": "Ready for test",
+    "verify": "Test Done",
+    "block": "Not Bug"
+  },
+
+  "commentTemplate": "Fix implemented:\n- Files modified: {files}\n- Changes: {changes}\n- Pages affected: {pages}\n- Ready for QA"
+}
