@@ -27,17 +27,13 @@ class EnvConfigService {
     }
 
     public getFrontendUrl(): string {
-        return this.getValue('FRONTEND_URL');
+        return this.getValue('FRONTEND_URL', false) || 'http://localhost:3000';
     }
 
     public getOrigins(): string[] {
-        try {
-            return this.getValue('ALLOW_ORIGINS')
-                .split(',')
-                .map((origin) => origin.trim());
-        } catch {
-            return [];
-        }
+        const origins = this.getValue('ALLOW_ORIGINS', false);
+        if (!origins) return [];
+        return origins.split(',').map((origin) => origin.trim());
     }
 
     public getTypeOrmConfig() {
@@ -54,10 +50,10 @@ class EnvConfigService {
 
     public getAwsConfig() {
         return {
-            AWS_REGION: this.getValue('AWS_REGION'),
-            AWS_ACCESS_KEY_ID: this.getValue('AWS_ACCESS_KEY_ID'),
-            AWS_SECRET_ACCESS_KEY: this.getValue('AWS_SECRET_ACCESS_KEY'),
-            AWS_S3_BUCKET: this.getValue('AWS_S3_BUCKET'),
+            AWS_REGION: this.getValue('AWS_REGION', false),
+            AWS_ACCESS_KEY_ID: this.getValue('AWS_ACCESS_KEY_ID', false),
+            AWS_SECRET_ACCESS_KEY: this.getValue('AWS_SECRET_ACCESS_KEY', false),
+            AWS_S3_BUCKET: this.getValue('AWS_S3_BUCKET', false),
         };
     }
 
@@ -81,10 +77,10 @@ class EnvConfigService {
 
     public getAppleConfig() {
         return {
-            APPLE_TEAM_ID: this.getValue('APPLE_TEAM_ID'),
-            APPLE_CLIENT_ID: this.getValue('APPLE_CLIENT_ID'),
-            APPLE_KEY_ID: this.getValue('APPLE_KEY_ID'),
-            APPLE_PRIVATE_KEY: this.getValue('APPLE_PRIVATE_KEY').replace(
+            APPLE_TEAM_ID: this.getValue('APPLE_TEAM_ID', false),
+            APPLE_CLIENT_ID: this.getValue('APPLE_CLIENT_ID', false),
+            APPLE_KEY_ID: this.getValue('APPLE_KEY_ID', false),
+            APPLE_PRIVATE_KEY: (this.getValue('APPLE_PRIVATE_KEY', false) || '').replace(
                 /\\n/g,
                 '\n',
             ),
@@ -105,16 +101,29 @@ class EnvConfigService {
 
     public getPushNotificationConfig() {
         return {
-            PROJECT_ID: this.getValue('PROJECT_ID'),
-            PRIVATE_KEY_ID: this.getValue('PRIVATE_KEY_ID'),
-            PRIVATE_KEY: this.getValue('PRIVATE_KEY'),
-            CLIENT_EMAIL: this.getValue('CLIENT_EMAIL'),
+            PROJECT_ID: this.getValue('PROJECT_ID', false),
+            PRIVATE_KEY_ID: this.getValue('PRIVATE_KEY_ID', false),
+            PRIVATE_KEY: this.getValue('PRIVATE_KEY', false),
+            CLIENT_EMAIL: this.getValue('CLIENT_EMAIL', false),
+        };
+    }
+
+    public getRedisConfig() {
+        return {
+            host: this.getValue('REDIS_HOST', false) || 'localhost',
+            port: parseInt(this.getValue('REDIS_PORT', false)) || 6379,
+        };
+    }
+
+    public getOtelConfig() {
+        return {
+            endpoint: this.getValue('OTEL_EXPORTER_OTLP_ENDPOINT', false) || 'http://localhost:4317',
         };
     }
 
     public getAuthJWTConfig() {
         return {
-            AUTH_JWT_SECRET: this.getValue('AUTH_JWT_SECRET'),
+            AUTH_JWT_SECRET: this.getValue('AUTH_JWT_SECRET', false) || 'default-jwt-secret',
             AUTH_TOKEN_COOKIE_NAME: this.getValue('AUTH_TOKEN_COOKIE_NAME'),
             AUTH_TOKEN_EXPIRED_TIME: this.getValue('AUTH_TOKEN_EXPIRED_TIME'),
             AUTH_TOKEN_EXPIRED_TIME_REMEMBER_ME: this.getValue(
@@ -136,22 +145,7 @@ const envConfigService = new EnvConfigService(process.env).ensureValues([
     'POSTGRES_USER',
     'POSTGRES_PASSWORD',
     'POSTGRES_DATABASE',
-    'ALLOW_ORIGINS',
     'MODE',
-    'FRONTEND_URL',
-    'AWS_REGION',
-    'AWS_ACCESS_KEY_ID',
-    'AWS_SECRET_ACCESS_KEY',
-    'AWS_S3_BUCKET',
-    'APPLE_TEAM_ID',
-    'APPLE_CLIENT_ID',
-    'APPLE_KEY_ID',
-    'APPLE_PRIVATE_KEY',
-
-    'PROJECT_ID',
-    'PRIVATE_KEY_ID',
-    'PRIVATE_KEY',
-    'CLIENT_EMAIL',
 ]);
 
 export { envConfigService };

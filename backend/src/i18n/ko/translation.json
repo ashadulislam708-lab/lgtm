@@ -111,6 +111,100 @@
     "errors": {
       "email_exists": "이메일 {{email}}로 이미 등록된 사용자가 있습니다."
     }
+  },
+  "products": {
+    "success": {
+      "created": "상품이 성공적으로 생성되었습니다.",
+      "updated": "상품이 성공적으로 업데이트되었습니다.",
+      "deleted": "상품이 성공적으로 삭제되었습니다.",
+      "retrieved": "상품이 성공적으로 조회되었습니다.",
+      "list": "상품 목록이 성공적으로 조회되었습니다.",
+      "bulk_imported": "상품이 성공적으로 가져오기되었습니다.",
+      "categories": "카테고리가 성공적으로 조회되었습니다."
+    },
+    "error": {
+      "not_found": "상품을 찾을 수 없습니다.",
+      "sku_exists": "SKU {{sku}}의 상품이 이미 존재합니다.",
+      "insufficient_stock": "상품 {{name}}의 재고가 부족합니다."
+    }
+  },
+  "orders": {
+    "success": {
+      "created": "주문이 성공적으로 접수되었습니다.",
+      "retrieved": "주문이 성공적으로 조회되었습니다.",
+      "list": "주문 목록이 성공적으로 조회되었습니다.",
+      "status_updated": "주문 상태가 성공적으로 변경되었습니다."
+    },
+    "error": {
+      "not_found": "주문을 찾을 수 없습니다.",
+      "empty_items": "주문에는 최소 하나의 상품이 포함되어야 합니다.",
+      "invalid_product": "상품 {{productId}}을(를) 찾을 수 없습니다.",
+      "insufficient_stock": "상품 {{productName}}의 재고가 부족합니다."
+    }
+  },
+  "payments": {
+    "success": {
+      "processed": "결제가 성공적으로 처리되었습니다.",
+      "status_retrieved": "결제 상태가 성공적으로 조회되었습니다.",
+      "enqueued": "결제 처리가 대기열에 추가되었습니다."
+    },
+    "error": {
+      "not_found": "결제를 찾을 수 없습니다.",
+      "gateway_error": "결제 게이트웨이 오류: {{message}}",
+      "gateway_timeout": "결제 게이트웨이 시간이 초과되었습니다.",
+      "already_paid": "이미 결제가 완료된 주문입니다."
+    }
+  },
+  "inventory": {
+    "success": {
+      "retrieved": "재고가 성공적으로 조회되었습니다.",
+      "synced": "재고가 성공적으로 동기화되었습니다.",
+      "stock_updated": "재고가 성공적으로 업데이트되었습니다."
+    },
+    "error": {
+      "sync_failed": "재고 동기화에 실패했습니다.",
+      "warehouse_timeout": "창고 API 시간이 초과되었습니다.",
+      "product_not_found": "재고 업데이트할 상품을 찾을 수 없습니다."
+    }
+  },
+  "reports": {
+    "success": {
+      "generated": "보고서가 성공적으로 생성되었습니다.",
+      "retrieved": "보고서가 성공적으로 조회되었습니다.",
+      "enqueued": "보고서 생성이 대기열에 추가되었습니다."
+    },
+    "error": {
+      "not_found": "보고서를 찾을 수 없습니다.",
+      "invalid_type": "잘못된 보고서 유형입니다.",
+      "generation_failed": "보고서 생성에 실패했습니다."
+    }
+  },
+  "notifications": {
+    "success": {
+      "retrieved": "알림이 성공적으로 조회되었습니다.",
+      "marked_read": "알림이 읽음으로 표시되었습니다."
+    },
+    "error": {
+      "not_found": "알림을 찾을 수 없습니다."
+    }
+  },
+  "health": {
+    "success": {
+      "healthy": "모든 시스템이 정상 작동 중입니다.",
+      "ready": "서비스가 준비되었습니다.",
+      "live": "서비스가 실행 중입니다."
+    },
+    "error": {
+      "unhealthy": "시스템 상태 확인에 실패했습니다.",
+      "database_down": "데이터베이스 연결에 실패했습니다.",
+      "redis_down": "Redis 연결에 실패했습니다."
+    }
+  },
+  "chaos": {
+    "success": {
+      "config_retrieved": "카오스 설정이 조회되었습니다.",
+      "config_updated": "카오스 설정이 업데이트되었습니다.",
+      "config_reset": "카오스 설정이 기본값으로 초기화되었습니다."
+    }
   }
-
 }

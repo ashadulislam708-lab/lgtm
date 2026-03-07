@@ -15,13 +15,21 @@ import jwtConfig from './config/jwt.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { join } from 'path';
-import { CorsMiddleware } from './core/middleware';
+import { CorsMiddleware, CorrelationIdMiddleware } from './core/middleware';
 import { UserModule } from './modules/users';
 import { AuthModule } from './modules/auth';
 import { PassportModule } from '@nestjs/passport';
 import { JwtAuthGuard, JwtStrategy } from './core/guards';
 import { OtpModule } from '@modules/otp/otp.module';
-import { FeaturesModule } from './modules/features/features.module';
+import { ProductsModule } from './modules/products/products.module';
+import { HealthModule } from './modules/health';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ChaosModule } from './modules/chaos';
+import { InventoryModule } from './modules/inventory';
+import { OrdersModule } from './modules/orders/orders.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { TelemetryModule } from './infrastructure/telemetry';
 import { LanguageEnum } from '@shared/enums';
 
 @Module({
@@ -80,7 +88,15 @@ import { LanguageEnum } from '@shared/enums';
         UserModule,
         AuthModule,
         OtpModule,
-        FeaturesModule,
+        ProductsModule,
+        HealthModule,
+        NotificationsModule,
+        ChaosModule,
+        InventoryModule,
+        OrdersModule,
+        PaymentsModule,
+        ReportsModule,
+        TelemetryModule,
     ],
     controllers: [AppController],
     providers: [
@@ -94,6 +110,6 @@ import { LanguageEnum } from '@shared/enums';
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(CorsMiddleware).forRoutes('*');
+        consumer.apply(CorsMiddleware, CorrelationIdMiddleware).forRoutes('*');
     }
 }

@@ -112,5 +112,100 @@
     "errors": {
       "email_exists": "A user with the email {{email}} already exists."
     }
+  },
+  "products": {
+    "success": {
+      "created": "Product created successfully",
+      "updated": "Product updated successfully",
+      "deleted": "Product deleted successfully",
+      "retrieved": "Product retrieved successfully",
+      "list": "Products retrieved successfully",
+      "bulk_imported": "Products imported successfully",
+      "categories": "Categories retrieved successfully"
+    },
+    "error": {
+      "not_found": "Product not found",
+      "sku_exists": "Product with SKU {{sku}} already exists",
+      "insufficient_stock": "Insufficient stock for product {{name}}"
+    }
+  },
+  "orders": {
+    "success": {
+      "created": "Order placed successfully",
+      "retrieved": "Order retrieved successfully",
+      "list": "Orders retrieved successfully",
+      "status_updated": "Order status updated successfully"
+    },
+    "error": {
+      "not_found": "Order not found",
+      "empty_items": "Order must contain at least one item",
+      "invalid_product": "Product {{productId}} not found",
+      "insufficient_stock": "Insufficient stock for product {{productName}}"
+    }
+  },
+  "payments": {
+    "success": {
+      "processed": "Payment processed successfully",
+      "status_retrieved": "Payment status retrieved successfully",
+      "enqueued": "Payment processing enqueued"
+    },
+    "error": {
+      "not_found": "Payment not found",
+      "gateway_error": "Payment gateway error: {{message}}",
+      "gateway_timeout": "Payment gateway timed out",
+      "already_paid": "Order has already been paid"
+    }
+  },
+  "inventory": {
+    "success": {
+      "retrieved": "Inventory retrieved successfully",
+      "synced": "Inventory synced successfully",
+      "stock_updated": "Stock updated successfully"
+    },
+    "error": {
+      "sync_failed": "Inventory sync failed",
+      "warehouse_timeout": "Warehouse API timed out",
+      "product_not_found": "Product not found for inventory update"
+    }
+  },
+  "reports": {
+    "success": {
+      "generated": "Report generated successfully",
+      "retrieved": "Report retrieved successfully",
+      "enqueued": "Report generation enqueued"
+    },
+    "error": {
+      "not_found": "Report not found",
+      "invalid_type": "Invalid report type",
+      "generation_failed": "Report generation failed"
+    }
+  },
+  "notifications": {
+    "success": {
+      "retrieved": "Notifications retrieved successfully",
+      "marked_read": "Notification marked as read"
+    },
+    "error": {
+      "not_found": "Notification not found"
+    }
+  },
+  "health": {
+    "success": {
+      "healthy": "All systems operational",
+      "ready": "Service is ready",
+      "live": "Service is alive"
+    },
+    "error": {
+      "unhealthy": "System health check failed",
+      "database_down": "Database connection failed",
+      "redis_down": "Redis connection failed"
+    }
+  },
+  "chaos": {
+    "success": {
+      "config_retrieved": "Chaos configuration retrieved",
+      "config_updated": "Chaos configuration updated",
+      "config_reset": "Chaos configuration reset to defaults"
+    }
   }
 }

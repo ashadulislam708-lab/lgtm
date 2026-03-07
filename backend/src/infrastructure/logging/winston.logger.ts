@@ -1,8 +1,21 @@
 import { createLogger, format, transports } from 'winston';
 import { existsSync, mkdirSync } from 'fs';
+import { trace, context } from '@opentelemetry/api';
 
-const customFormat = format.printf(({ timestamp, level, stack, message }) => {
-    return `${timestamp} - [${level.toUpperCase().padEnd(7)}] - ${message}`;
+const otelTraceFormat = format((info) => {
+    const activeSpan = trace.getSpan(context.active());
+    if (activeSpan) {
+        const spanContext = activeSpan.spanContext();
+        info.traceId = spanContext.traceId;
+        info.spanId = spanContext.spanId;
+        info.traceFlags = spanContext.traceFlags;
+    }
+    return info;
+});
+
+const customFormat = format.printf(({ timestamp, level, message, traceId, spanId }) => {
+    const traceInfo = traceId ? ` [trace=${traceId} span=${spanId}]` : '';
+    return `${timestamp} - [${level.toUpperCase().padEnd(7)}]${traceInfo} - ${message}`;
 });
 
 if (!existsSync('logs')) {
@@ -13,6 +26,7 @@ const devLogger = {
     format: format.combine(
         format.timestamp(),
         format.errors({ stack: true }),
+        otelTraceFormat(),
         customFormat,
     ),
     transports: [new transports.Console()],
@@ -23,6 +37,7 @@ const prodLogger = {
     format: format.combine(
         format.timestamp(),
         format.errors({ stack: true }),
+        otelTraceFormat(),
         format.json(),
     ),
     transports: [
