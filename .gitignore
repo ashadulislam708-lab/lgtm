@@ -1,0 +1,29 @@
+# Node
+**/node_modules/
+**/dist/
+**/build/
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/.venv/
+
+# Environment
+**/.env
+**/.env.local
+**/.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude project secrets and temp files
+.claude-project/secrets/*
+!.claude-project/secrets/.gitkeep
+.claude-project/status/temp/*
+!.claude-project/status/temp/.gitkeep
