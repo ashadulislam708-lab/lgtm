@@ -1,7 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 import { existsSync, mkdirSync } from 'fs';
 
-const customFormat = format.printf(({ timestamp, level, stack, message }) => {
+const customFormat = format.printf(({ timestamp, level, message }) => {
     return `${timestamp} - [${level.toUpperCase().padEnd(7)}] - ${message}`;
 });
 

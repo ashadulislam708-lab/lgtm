@@ -12,6 +12,7 @@ import {
 } from './core/filters/http-exception.filter';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
 
+
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
         cors: true,
@@ -81,6 +82,14 @@ async function bootstrap() {
             .addTag('OTP', 'OTP management endpoints')
             .addTag('Users', 'User management endpoints')
             .addTag('Features', 'Feature management endpoints')
+            .addTag('Products', 'Product management endpoints')
+            .addTag('Orders', 'Order management endpoints')
+            .addTag('Notifications', 'Notification management endpoints')
+            .addTag('Health', 'Health and metrics endpoints')
+            .addTag('Chaos', 'Chaos engineering endpoints')
+            .addTag('Inventory', 'Inventory management endpoints')
+            .addTag('Payments', 'Payment processing endpoints')
+            .addTag('Reports', 'Report generation endpoints')
             .build();
 
         const document = SwaggerModule.createDocument(app, config, {

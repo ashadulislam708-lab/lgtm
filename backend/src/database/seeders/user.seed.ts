@@ -2,49 +2,88 @@ import { DataSource } from 'typeorm';
 import { User } from 'src/modules/users/user.entity';
 import { RolesEnum } from 'src/shared/enums/role.enum';
 import { ActiveStatusEnum } from 'src/shared/enums/active-status.enum';
-import { UtilsService } from '@infrastructure/utils/utils.service';
+import * as bcrypt from 'bcrypt';
 
-export async function seedUsers(
-    dataSource: DataSource,
-    utilsService: UtilsService,
-): Promise<void> {
+const FIRST_NAMES = [
+    'James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda',
+    'David', 'Elizabeth', 'William', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica',
+    'Thomas', 'Sarah', 'Christopher', 'Karen', 'Charles', 'Lisa', 'Daniel', 'Nancy',
+    'Matthew', 'Betty', 'Anthony', 'Margaret', 'Mark', 'Sandra', 'Donald', 'Ashley',
+    'Steven', 'Dorothy', 'Paul', 'Kimberly', 'Andrew', 'Emily', 'Joshua', 'Donna',
+    'Kenneth', 'Michelle', 'Kevin', 'Carol', 'Brian', 'Amanda', 'George', 'Melissa',
+    'Timothy', 'Deborah',
+];
+
+const LAST_NAMES = [
+    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
+    'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson',
+    'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson',
+    'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson', 'Walker',
+    'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores',
+    'Green', 'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell',
+    'Carter', 'Roberts',
+];
+
+function randomDate(monthsBack: number): Date {
+    const now = new Date();
+    const past = new Date(now.getTime() - monthsBack * 30 * 24 * 60 * 60 * 1000);
+    const diff = now.getTime() - past.getTime();
+    return new Date(past.getTime() + Math.random() * diff);
+}
+
+export async function seedUsers(dataSource: DataSource): Promise<User[]> {
     const userRepository = dataSource.getRepository(User);
 
-    // Check if users already exist
-    const existingUsers = await userRepository.count();
+    console.log('Seeding users...');
 
-    if (existingUsers > 0) {
-        console.log(`ℹ️  ${existingUsers} user(s) already exist in database`);
-        return;
+    const hashedPassword = await bcrypt.hash('Password123!', 10);
+    const users: Partial<User>[] = [];
+
+    // 3 Admin users
+    const adminEmails = ['admin@orderflow.com', 'admin2@orderflow.com', 'admin3@orderflow.com'];
+    const adminNames = ['Admin User', 'Admin Manager', 'Admin Supervisor'];
+    for (let i = 0; i < 3; i++) {
+        users.push({
+            email: adminEmails[i],
+            password: hashedPassword,
+            fullName: adminNames[i],
+            firstName: adminNames[i].split(' ')[0],
+            lastName: adminNames[i].split(' ')[1],
+            role: RolesEnum.ADMIN,
+            isActive: ActiveStatusEnum.ACTIVE,
+            emailVerified: true,
+            isVerified: true,
+            createdAt: randomDate(6),
+        });
     }
 
-    console.log('Creating default users...');
+    // 50 Customer users
+    for (let i = 1; i <= 50; i++) {
+        const firstName = FIRST_NAMES[i - 1] || FIRST_NAMES[i % FIRST_NAMES.length];
+        const lastName = LAST_NAMES[i - 1] || LAST_NAMES[i % LAST_NAMES.length];
+        users.push({
+            email: `customer${i}@test.com`,
+            password: hashedPassword,
+            fullName: `${firstName} ${lastName}`,
+            firstName,
+            lastName,
+            role: RolesEnum.USER,
+            isActive: ActiveStatusEnum.ACTIVE,
+            emailVerified: true,
+            isVerified: true,
+            createdAt: randomDate(6),
+        });
+    }
 
-    // Create Admin User
-    const hashedAdminPassword = await utilsService.getHash('admin123');
-    const adminUser = userRepository.create({
-        fullName: 'Admin User',
-        email: 'admin@example.com',
-        password: hashedAdminPassword,
-        role: RolesEnum.ADMIN,
-        isActive: ActiveStatusEnum.ACTIVE,
-        emailVerified: true,
-    });
-    await userRepository.save(adminUser);
-    console.log('✅ Admin user created: admin@example.com / admin123');
+    // Insert in batches
+    const savedUsers: User[] = [];
+    for (let i = 0; i < users.length; i += 50) {
+        const batch = users.slice(i, i + 50);
+        const created = userRepository.create(batch);
+        const saved = await userRepository.save(created);
+        savedUsers.push(...saved);
+    }
 
-    // Create Regular User
-    const hashedUserPassword = await utilsService.getHash('user123');
-    const regularUser = userRepository.create({
-        fullName: 'Test User',
-        email: 'user@example.com',
-        password: hashedUserPassword,
-        role: RolesEnum.USER,
-        isActive: ActiveStatusEnum.ACTIVE,
-        emailVerified: true,
-    });
-    await userRepository.save(regularUser);
-    console.log('✅ Regular user created: user@example.com / user123');
-
-    console.log(`✅ Successfully created 2 users`);
+    console.log(`Created ${savedUsers.length} users (3 admins + 50 customers)`);
+    return savedUsers;
 }
