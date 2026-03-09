@@ -29,7 +29,7 @@ import { InventoryModule } from './modules/inventory';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ReportsModule } from './modules/reports/reports.module';
-import { TelemetryModule } from './infrastructure/telemetry';
+
 import { LanguageEnum } from '@shared/enums';
 
 @Module({
@@ -96,7 +96,6 @@ import { LanguageEnum } from '@shared/enums';
         OrdersModule,
         PaymentsModule,
         ReportsModule,
-        TelemetryModule,
     ],
     controllers: [AppController],
     providers: [

@@ -1,4 +1,3 @@
-import './infrastructure/telemetry/tracing';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import cookieParser = require('cookie-parser');
@@ -12,8 +11,7 @@ import {
     AllExceptionsFilter,
 } from './core/filters/http-exception.filter';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
-import { MetricsInterceptor } from './core/interceptors/metrics.interceptor';
-import { MetricsService } from './modules/health/services/metrics.service';
+
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -27,10 +25,6 @@ async function bootstrap() {
 
     // Global Transform Interceptor - wraps all responses in ResponsePayloadDto
     app.useGlobalInterceptors(new TransformInterceptor());
-
-    // Global Metrics Interceptor - records request duration and counters
-    const metricsService = app.get(MetricsService);
-    app.useGlobalInterceptors(new MetricsInterceptor(metricsService));
 
     // Add API prefix - all routes will be /api/*
     app.setGlobalPrefix('api', {

@@ -115,12 +115,6 @@ class EnvConfigService {
         };
     }
 
-    public getOtelConfig() {
-        return {
-            endpoint: this.getValue('OTEL_EXPORTER_OTLP_ENDPOINT', false) || 'http://localhost:4317',
-        };
-    }
-
     public getAuthJWTConfig() {
         return {
             AUTH_JWT_SECRET: this.getValue('AUTH_JWT_SECRET', false) || 'default-jwt-secret',
