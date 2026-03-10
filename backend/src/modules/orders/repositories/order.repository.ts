@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsRelations } from 'typeorm';
-import { BaseRepository } from '@core/base/base.repository.js';
-import { Order } from '../entities/order.entity.js';
-import { OrderFilterDto } from '../dto/order-filter.dto.js';
-import { RolesEnum } from '@shared/enums/role.enum.js';
+import { BaseRepository } from '@core/base/base.repository';
+import { Order } from '../entities/order.entity';
+import { OrderFilterDto } from '../dto/order-filter.dto';
+import { RolesEnum } from '@shared/enums/role.enum';
 
 @Injectable()
 export class OrderRepository extends BaseRepository<Order> {

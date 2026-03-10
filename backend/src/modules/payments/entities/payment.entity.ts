@@ -5,10 +5,10 @@ import {
     ManyToOne,
     JoinColumn,
 } from 'typeorm';
-import { BaseEntity } from '@core/base/base.entity.js';
+import { BaseEntity } from '@core/base/base.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Order } from '@modules/orders/entities/order.entity.js';
-import { PaymentStatusEnum } from '@shared/enums/payment-status.enum.js';
+import { Order } from '@modules/orders/entities/order.entity';
+import { PaymentStatusEnum } from '@shared/enums/payment-status.enum';
 
 @Entity('payments')
 @Index(['orderId'])

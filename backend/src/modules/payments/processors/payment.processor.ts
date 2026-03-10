@@ -3,12 +3,12 @@ import { Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue, Job } from 'bullmq';
 import { DataSource } from 'typeorm';
-import { PaymentRepository } from '../repositories/payment.repository.js';
-import { PaymentGatewayService } from '../services/payment-gateway.service.js';
-import { Payment } from '../entities/payment.entity.js';
-import { Order } from '@modules/orders/entities/order.entity.js';
-import { PaymentStatusEnum } from '@shared/enums/payment-status.enum.js';
-import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants.js';
+import { PaymentRepository } from '../repositories/payment.repository';
+import { PaymentGatewayService } from '../services/payment-gateway.service';
+import { Payment } from '../entities/payment.entity';
+import { Order } from '@modules/orders/entities/order.entity';
+import { PaymentStatusEnum } from '@shared/enums/payment-status.enum';
+import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
 
 interface PaymentJobData {
     orderId: string;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { ChaosConfigService } from '@modules/chaos/services/chaos-config.service.js';
+import { ChaosConfigService } from '@modules/chaos/services/chaos-config.service';
 
 export interface GatewayChargeResult {
     success: boolean;

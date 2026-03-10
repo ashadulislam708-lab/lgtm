@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bullmq';
-import { Order } from './entities/order.entity.js';
-import { OrderItem } from './entities/order-item.entity.js';
-import { OrderRepository } from './repositories/order.repository.js';
-import { OrderItemRepository } from './repositories/order-item.repository.js';
-import { OrderService } from './services/order.service.js';
-import { OrderController } from './controllers/order.controller.js';
-import { ProductsModule } from '@modules/products/products.module.js';
-import { I18nHelper } from '@core/utils/i18n.helper.js';
-import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants.js';
-import { QueueModule } from '@infrastructure/queue/queue.module.js';
+import { Order } from './entities/order.entity';
+import { OrderItem } from './entities/order-item.entity';
+import { OrderRepository } from './repositories/order.repository';
+import { OrderItemRepository } from './repositories/order-item.repository';
+import { OrderService } from './services/order.service';
+import { OrderController } from './controllers/order.controller';
+import { ProductsModule } from '@modules/products/products.module';
+import { I18nHelper } from '@core/utils/i18n.helper';
+import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
+import { QueueModule } from '@infrastructure/queue/queue.module';
 
 @Module({
     imports: [

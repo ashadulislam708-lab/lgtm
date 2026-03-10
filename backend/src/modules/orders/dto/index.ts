@@ -1,3 +1,3 @@
-export * from './create-order.dto.js';
-export * from './order-filter.dto.js';
-export * from './update-order-status.dto.js';
+export * from './create-order.dto';
+export * from './order-filter.dto';
+export * from './update-order-status.dto';

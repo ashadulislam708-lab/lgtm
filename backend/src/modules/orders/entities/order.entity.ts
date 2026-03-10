@@ -6,13 +6,13 @@ import {
     OneToMany,
     JoinColumn,
 } from 'typeorm';
-import { BaseEntity } from '@core/base/base.entity.js';
+import { BaseEntity } from '@core/base/base.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { User } from '@modules/users/user.entity.js';
-import { OrderItem } from './order-item.entity.js';
-import { OrderStatusEnum } from '@shared/enums/order-status.enum.js';
-import { PaymentStatusEnum } from '@shared/enums/payment-status.enum.js';
-import { Payment } from '@modules/payments/entities/payment.entity.js';
+import { User } from '@modules/users/user.entity';
+import { OrderItem } from './order-item.entity';
+import { OrderStatusEnum } from '@shared/enums/order-status.enum';
+import { PaymentStatusEnum } from '@shared/enums/payment-status.enum';
+import { Payment } from '@modules/payments/entities/payment.entity';
 
 @Entity('orders')
 @Index(['trackingId'], { unique: true })

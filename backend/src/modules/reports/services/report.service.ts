@@ -3,9 +3,9 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { I18nHelper } from '@core/utils/i18n.helper.js';
-import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants.js';
-import { GenerateReportDto, ReportTypeEnum } from '../dto/generate-report.dto.js';
+import { I18nHelper } from '@core/utils/i18n.helper';
+import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
+import { GenerateReportDto, ReportTypeEnum } from '../dto/generate-report.dto';
 
 interface ReportResult {
     status: string;
