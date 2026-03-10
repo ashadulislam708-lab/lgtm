@@ -1,0 +1,1129 @@
+{
+	"info": {
+		"_postman_id": "lgtm-api-collection",
+		"name": "LGTM API Collection",
+		"description": "Complete API collection for LGTM NestJS application.\n\nBase URL: http://localhost:3000/api\nSwagger Docs: http://localhost:3000/docs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "orderId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "featureId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "notificationId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Readiness Probe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health/ready",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "ready"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Liveness Probe",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health/live",
+							"host": ["{{baseUrl}}"],
+							"path": ["health", "live"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data && res.data.id) {",
+									"    pm.collectionVariables.set('userId', res.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\",\n  \"phone\": \"+1234567890\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data) {",
+									"    if (res.data.accessToken) pm.collectionVariables.set('accessToken', res.data.accessToken);",
+									"    if (res.data.refreshToken) pm.collectionVariables.set('refreshToken', res.data.refreshToken);",
+									"    if (res.data.user && res.data.user.id) pm.collectionVariables.set('userId', res.data.user.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\",\n  \"rememberMe\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Admin Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data) {",
+									"    if (res.data.accessToken) pm.collectionVariables.set('accessToken', res.data.accessToken);",
+									"    if (res.data.refreshToken) pm.collectionVariables.set('refreshToken', res.data.refreshToken);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/admin-login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "admin-login"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Social Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"provider\": \"google\",\n  \"accessToken\": \"your-social-access-token\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/social-login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "social-login"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Apple Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identityToken\": \"your-apple-identity-token\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/apple-login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "apple-login"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Check Login Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/check-login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "check-login"]
+						}
+					}
+				},
+				{
+					"name": "Refresh Access Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data) {",
+									"    if (res.data.accessToken) pm.collectionVariables.set('accessToken', res.data.accessToken);",
+									"    if (res.data.refreshToken) pm.collectionVariables.set('refreshToken', res.data.refreshToken);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh-access-token?refreshToken={{refreshToken}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh-access-token"],
+							"query": [
+								{ "key": "refreshToken", "value": "{{refreshToken}}" }
+							]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"oldPassword\": \"Password123!\",\n  \"newPassword\": \"NewPassword456!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/change-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "change-password"]
+						}
+					}
+				},
+				{
+					"name": "Change User Password (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{userId}}\",\n  \"newPassword\": \"NewPassword456!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/change-user-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "change-user-password"]
+						}
+					}
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "forgot-password"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\",\n  \"otp\": \"123456\",\n  \"newPassword\": \"ResetPassword789!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/reset-password",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "reset-password"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Register FCM Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"your-fcm-device-token\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register-fcm-token",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "register-fcm-token"]
+						}
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "OTP",
+			"item": [
+				{
+					"name": "Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/otp/send",
+							"host": ["{{baseUrl}}"],
+							"path": ["otp", "send"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"testuser@example.com\",\n  \"otp\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/otp/verify",
+							"host": ["{{baseUrl}}"],
+							"path": ["otp", "verify"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Active Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/active",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "active"]
+						}
+					}
+				},
+				{
+					"name": "Search Users by Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/search?email=testuser@example.com",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "search"],
+							"query": [
+								{ "key": "email", "value": "testuser@example.com" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Count",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/count",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "count"]
+						}
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"+0987654321\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "List Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{ "key": "search", "value": "", "disabled": true },
+								{ "key": "category", "value": "", "disabled": true },
+								{ "key": "priceMin", "value": "", "disabled": true },
+								{ "key": "priceMax", "value": "", "disabled": true },
+								{ "key": "sortBy", "value": "createdAt", "disabled": true },
+								{ "key": "sortOrder", "value": "DESC", "disabled": true }
+							]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Get Product Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "categories"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{productId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "{{productId}}"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Create Product (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data && res.data.id) {",
+									"    pm.collectionVariables.set('productId', res.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Product\",\n  \"description\": \"A sample product for testing\",\n  \"price\": 29.99,\n  \"category\": \"Electronics\",\n  \"sku\": \"TEST-SKU-001\",\n  \"stockQuantity\": 100,\n  \"imageUrl\": \"https://example.com/image.jpg\",\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						}
+					}
+				},
+				{
+					"name": "Update Product (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Product Name\",\n  \"price\": 39.99,\n  \"stockQuantity\": 150\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/{{productId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "{{productId}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Product (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{productId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "{{productId}}"]
+						}
+					}
+				},
+				{
+					"name": "Bulk Import Products (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"products\": [\n    {\n      \"name\": \"Bulk Product 1\",\n      \"price\": 19.99,\n      \"category\": \"Electronics\",\n      \"sku\": \"BULK-001\",\n      \"stockQuantity\": 50\n    },\n    {\n      \"name\": \"Bulk Product 2\",\n      \"price\": 24.99,\n      \"category\": \"Clothing\",\n      \"sku\": \"BULK-002\",\n      \"stockQuantity\": 75\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/bulk-import",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "bulk-import"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Place Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data && res.data.id) {",
+									"    pm.collectionVariables.set('orderId', res.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"items\": [\n    {\n      \"productId\": \"{{productId}}\",\n      \"quantity\": 2,\n      \"unitPrice\": 29.99\n    }\n  ],\n  \"shippingAddress\": \"123 Test Street, City, Country\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders"]
+						}
+					}
+				},
+				{
+					"name": "List Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{ "key": "status", "value": "", "disabled": true },
+								{ "key": "search", "value": "", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Order by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders", "{{orderId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Order Status (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"CONFIRMED\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/orders/{{orderId}}/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["orders", "{{orderId}}", "status"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Process Payment (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": \"{{orderId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/process",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "process"]
+						}
+					}
+				},
+				{
+					"name": "Get Payment Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/{{orderId}}/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "{{orderId}}", "status"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "List Inventory (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["inventory"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{ "key": "category", "value": "", "disabled": true },
+								{ "key": "search", "value": "", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Sync Inventory (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/inventory/sync",
+							"host": ["{{baseUrl}}"],
+							"path": ["inventory", "sync"]
+						}
+					}
+				},
+				{
+					"name": "Update Stock (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"stockQuantity\": 200\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/inventory/{{productId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["inventory", "{{productId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Features",
+			"item": [
+				{
+					"name": "List Features",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["features"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" }
+							]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Get Featured Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features/featured",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "featured"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Search Features",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features/search?q=test",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "search"],
+							"query": [
+								{ "key": "q", "value": "test" }
+							]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Get Top Rated",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features/top-rated?limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "top-rated"],
+							"query": [
+								{ "key": "limit", "value": "10" }
+							]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Get Feature by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features/{{featureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "{{featureId}}"]
+						},
+						"auth": { "type": "noauth" }
+					}
+				},
+				{
+					"name": "Create Feature",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const res = pm.response.json();",
+									"if (res.data && res.data.id) {",
+									"    pm.collectionVariables.set('featureId', res.data.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Test Feature\",\n  \"description\": \"A test feature product\",\n  \"price\": 49.99,\n  \"category\": \"Electronics\",\n  \"stockQuantity\": 50,\n  \"isFeatured\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/features",
+							"host": ["{{baseUrl}}"],
+							"path": ["features"]
+						}
+					}
+				},
+				{
+					"name": "Update Feature (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Feature\",\n  \"price\": 59.99\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/features/{{featureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "{{featureId}}"]
+						}
+					}
+				},
+				{
+					"name": "Toggle Featured Status (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features/{{featureId}}/toggle-featured",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "{{featureId}}", "toggle-featured"]
+						}
+					}
+				},
+				{
+					"name": "Update Feature Stock (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features/{{featureId}}/stock?quantity=100",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "{{featureId}}", "stock"],
+							"query": [
+								{ "key": "quantity", "value": "100" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Feature (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/features/{{featureId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["features", "{{featureId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "List Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{ "key": "isRead", "value": "false", "disabled": true },
+								{ "key": "search", "value": "", "disabled": true }
+							]
+						}
+					}
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
+							"host": ["{{baseUrl}}"],
+							"path": ["notifications", "{{notificationId}}", "read"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Generate Report (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"type\": \"SALES\",\n  \"dateFrom\": \"2026-01-01\",\n  \"dateTo\": \"2026-03-10\",\n  \"format\": \"JSON\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reports",
+							"host": ["{{baseUrl}}"],
+							"path": ["reports"]
+						}
+					}
+				},
+				{
+					"name": "Get Report Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reports/{{jobId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["reports", "{{jobId}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Chaos Engineering",
+			"item": [
+				{
+					"name": "Get Chaos Config",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chaos/config",
+							"host": ["{{baseUrl}}"],
+							"path": ["chaos", "config"]
+						}
+					}
+				},
+				{
+					"name": "Set Chaos Config",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"enabled\": true,\n  \"latencyMs\": 500,\n  \"errorRate\": 0.1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chaos/config",
+							"host": ["{{baseUrl}}"],
+							"path": ["chaos", "config"]
+						}
+					}
+				},
+				{
+					"name": "Reset Chaos Config",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chaos/reset",
+							"host": ["{{baseUrl}}"],
+							"path": ["chaos", "reset"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

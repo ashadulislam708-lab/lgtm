@@ -12,22 +12,23 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiSwagger } from '@core/decorators/api-swagger.decorator.js';
-import { CurrentUser } from '@core/decorators/current-user.decorator.js';
-import { Roles } from '@core/decorators/roles.decorator.js';
-import { RolesGuard } from '@core/guards/roles.guard.js';
-import { RolesEnum } from '@shared/enums/role.enum.js';
+import { ApiSwagger } from '@core/decorators/api-swagger.decorator';
+import { CurrentUser } from '@core/decorators/current-user.decorator';
+import { Roles } from '@core/decorators/roles.decorator';
+import { RolesGuard } from '@core/guards/roles.guard';
+import { RolesEnum } from '@shared/enums/role.enum';
+
 import {
     CreatedResponseDto,
     SuccessResponseDto,
     UpdatedResponseDto,
     PaginatedResponseDto,
-} from '@shared/dtos/response.dto.js';
-import { Order } from '../entities/order.entity.js';
-import { OrderService } from '../services/order.service.js';
-import { CreateOrderDto } from '../dto/create-order.dto.js';
-import { OrderFilterDto } from '../dto/order-filter.dto.js';
-import { UpdateOrderStatusDto } from '../dto/update-order-status.dto.js';
+} from '@shared/dtos/response.dto';
+import { Order } from '../entities/order.entity';
+import { OrderService } from '../services/order.service';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { OrderFilterDto } from '../dto/order-filter.dto';
+import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
 
 @ApiTags('Orders')
 @Controller('orders')

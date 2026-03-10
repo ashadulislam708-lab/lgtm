@@ -9,13 +9,13 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiSwagger } from '@core/decorators/api-swagger.decorator.js';
-import { Roles } from '@core/decorators/roles.decorator.js';
-import { RolesGuard } from '@core/guards/roles.guard.js';
-import { RolesEnum } from '@shared/enums/role.enum.js';
-import { SuccessResponseDto } from '@shared/dtos/response.dto.js';
-import { ReportService } from '../services/report.service.js';
-import { GenerateReportDto } from '../dto/generate-report.dto.js';
+import { ApiSwagger } from '@core/decorators/api-swagger.decorator';
+import { Roles } from '@core/decorators/roles.decorator';
+import { RolesGuard } from '@core/guards/roles.guard';
+import { RolesEnum } from '@shared/enums/role.enum';
+import { SuccessResponseDto } from '@shared/dtos/response.dto';
+import { ReportService } from '../services/report.service';
+import { GenerateReportDto } from '../dto/generate-report.dto';
 
 @ApiTags('Reports')
 @Controller('reports')

@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { I18nHelper } from '@core/utils/i18n.helper.js';
-import { PaymentRepository } from '../repositories/payment.repository.js';
-import { OrderRepository } from '@modules/orders/repositories/order.repository.js';
-import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants.js';
+import { I18nHelper } from '@core/utils/i18n.helper';
+import { PaymentRepository } from '../repositories/payment.repository';
+import { OrderRepository } from '@modules/orders/repositories/order.repository';
+import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
 
 @Injectable()
 export class PaymentService {

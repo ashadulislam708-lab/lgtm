@@ -4,10 +4,10 @@ import {
     ManyToOne,
     JoinColumn,
 } from 'typeorm';
-import { BaseEntity } from '@core/base/base.entity.js';
+import { BaseEntity } from '@core/base/base.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Order } from './order.entity.js';
-import { Product } from '@modules/products/entities/product.entity.js';
+import { Order } from './order.entity';
+import { Product } from '@modules/products/entities/product.entity';
 
 @Entity('order_items')
 export class OrderItem extends BaseEntity {

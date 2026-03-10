@@ -1,9 +1,9 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants.js';
-import { ReportService } from '../services/report.service.js';
-import { ReportTypeEnum } from '../dto/generate-report.dto.js';
+import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
+import { ReportService } from '../services/report.service';
+import { ReportTypeEnum } from '../dto/generate-report.dto';
 
 interface ReportJobData {
     type: ReportTypeEnum;

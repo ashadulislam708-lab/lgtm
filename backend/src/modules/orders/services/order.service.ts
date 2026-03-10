@@ -7,21 +7,21 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { BaseService } from '@core/base/base.service.js';
-import { I18nHelper } from '@core/utils/i18n.helper.js';
-import { Order } from '../entities/order.entity.js';
-import { OrderItem } from '../entities/order-item.entity.js';
-import { OrderRepository } from '../repositories/order.repository.js';
-import { OrderItemRepository } from '../repositories/order-item.repository.js';
-import { ProductService } from '@modules/products/services/product.service.js';
-import { CreateOrderDto } from '../dto/create-order.dto.js';
-import { OrderFilterDto } from '../dto/order-filter.dto.js';
-import { UpdateOrderStatusDto } from '../dto/update-order-status.dto.js';
-import { OrderStatusEnum } from '@shared/enums/order-status.enum.js';
-import { RolesEnum } from '@shared/enums/role.enum.js';
-import { PaymentStatusEnum } from '@shared/enums/payment-status.enum.js';
-import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants.js';
-import { Product } from '@modules/products/entities/product.entity.js';
+import { BaseService } from '@core/base/base.service';
+import { I18nHelper } from '@core/utils/i18n.helper';
+import { Order } from '../entities/order.entity';
+import { OrderItem } from '../entities/order-item.entity';
+import { OrderRepository } from '../repositories/order.repository';
+import { OrderItemRepository } from '../repositories/order-item.repository';
+import { ProductService } from '@modules/products/services/product.service';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { OrderFilterDto } from '../dto/order-filter.dto';
+import { UpdateOrderStatusDto } from '../dto/update-order-status.dto';
+import { OrderStatusEnum } from '@shared/enums/order-status.enum';
+import { RolesEnum } from '@shared/enums/role.enum';
+import { PaymentStatusEnum } from '@shared/enums/payment-status.enum';
+import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
+import { Product } from '@modules/products/entities/product.entity';
 
 @Injectable()
 export class OrderService extends BaseService<Order> {

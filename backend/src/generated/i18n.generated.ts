@@ -140,6 +140,101 @@ export type I18nTranslations = {
                 "email_exists": string;
             };
         };
+        "products": {
+            "success": {
+                "created": string;
+                "updated": string;
+                "deleted": string;
+                "retrieved": string;
+                "list": string;
+                "bulk_imported": string;
+                "categories": string;
+            };
+            "error": {
+                "not_found": string;
+                "sku_exists": string;
+                "insufficient_stock": string;
+            };
+        };
+        "orders": {
+            "success": {
+                "created": string;
+                "retrieved": string;
+                "list": string;
+                "status_updated": string;
+            };
+            "error": {
+                "not_found": string;
+                "empty_items": string;
+                "invalid_product": string;
+                "insufficient_stock": string;
+            };
+        };
+        "payments": {
+            "success": {
+                "processed": string;
+                "status_retrieved": string;
+                "enqueued": string;
+            };
+            "error": {
+                "not_found": string;
+                "gateway_error": string;
+                "gateway_timeout": string;
+                "already_paid": string;
+            };
+        };
+        "inventory": {
+            "success": {
+                "retrieved": string;
+                "synced": string;
+                "stock_updated": string;
+            };
+            "error": {
+                "sync_failed": string;
+                "warehouse_timeout": string;
+                "product_not_found": string;
+            };
+        };
+        "reports": {
+            "success": {
+                "generated": string;
+                "retrieved": string;
+                "enqueued": string;
+            };
+            "error": {
+                "not_found": string;
+                "invalid_type": string;
+                "generation_failed": string;
+            };
+        };
+        "notifications": {
+            "success": {
+                "retrieved": string;
+                "marked_read": string;
+            };
+            "error": {
+                "not_found": string;
+            };
+        };
+        "health": {
+            "success": {
+                "healthy": string;
+                "ready": string;
+                "live": string;
+            };
+            "error": {
+                "unhealthy": string;
+                "database_down": string;
+                "redis_down": string;
+            };
+        };
+        "chaos": {
+            "success": {
+                "config_retrieved": string;
+                "config_updated": string;
+                "config_reset": string;
+            };
+        };
     };
 };
 /* prettier-ignore */
