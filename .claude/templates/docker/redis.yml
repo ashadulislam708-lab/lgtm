@@ -1,0 +1,16 @@
+# META: volumes=[redis-data]
+  redis:
+    image: redis:7-alpine
+    container_name: $PROJECT_NAME-redis
+    restart: unless-stopped
+    ports:
+      - '$REDIS_PORT:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - $PROJECT_NAME-network

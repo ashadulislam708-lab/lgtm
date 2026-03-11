@@ -1,0 +1,13 @@
+# META: volumes=[]
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: $PROJECT_NAME-frontend
+    restart: unless-stopped
+    ports:
+      - '$FRONTEND_PORT:5173'
+    volumes:
+      - ./frontend/src:/app/src
+    networks:
+      - $PROJECT_NAME-network
