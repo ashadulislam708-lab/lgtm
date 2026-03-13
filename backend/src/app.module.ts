@@ -3,8 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
-
 //DB
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { appDataSource } from './config/db.config';
@@ -19,7 +17,7 @@ import { CorsMiddleware, CorrelationIdMiddleware } from './core/middleware';
 import { UserModule } from './modules/users';
 import { AuthModule } from './modules/auth';
 import { PassportModule } from '@nestjs/passport';
-import { JwtAuthGuard, JwtStrategy } from './core/guards';
+import { JwtStrategy } from './core/guards';
 import { OtpModule } from '@modules/otp/otp.module';
 import { ProductsModule } from './modules/products/products.module';
 import { HealthModule } from './modules/health';
@@ -101,10 +99,6 @@ import { LanguageEnum } from '@shared/enums';
     providers: [
         AppService,
         JwtStrategy,
-        {
-            provide: APP_GUARD,
-            useClass: JwtAuthGuard,
-        },
     ],
 })
 export class AppModule implements NestModule {

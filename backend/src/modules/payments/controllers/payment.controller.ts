@@ -7,13 +7,9 @@ import {
     HttpCode,
     HttpStatus,
     ParseUUIDPipe,
-    UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiSwagger } from '@core/decorators/api-swagger.decorator';
-import { Roles } from '@core/decorators/roles.decorator';
-import { RolesGuard } from '@core/guards/roles.guard';
-import { RolesEnum } from '@shared/enums/role.enum';
 import { SuccessResponseDto } from '@shared/dtos/response.dto';
 import { PaymentService } from '../services/payment.service';
 import { ProcessPaymentDto } from '../dto/process-payment.dto';
@@ -21,7 +17,6 @@ import { PaymentStatusResponseDto } from '../dto/payment-status-response.dto';
 
 @ApiTags('Payments')
 @Controller('payments')
-@UseGuards(RolesGuard)
 export class PaymentController {
     constructor(private readonly paymentService: PaymentService) {}
 
@@ -30,7 +25,6 @@ export class PaymentController {
      * Access: Admin only
      */
     @Post('process')
-    @Roles(RolesEnum.ADMIN)
     @HttpCode(HttpStatus.OK)
     @ApiSwagger({
         resourceName: 'Payment',

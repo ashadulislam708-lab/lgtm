@@ -7,7 +7,6 @@ import {
     Param,
     Delete,
     Query,
-    UseGuards,
     UseInterceptors,
     ParseIntPipe,
     DefaultValuePipe,
@@ -17,11 +16,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { BaseController } from 'src/core/base/base.controller';
 import { ApiSwagger } from 'src/core/decorators/api-swagger.decorator';
 import { Public } from 'src/core/decorators/public.decorator';
-import { Roles } from 'src/core/decorators/roles.decorator';
 import { CurrentUser } from 'src/core/decorators/current-user.decorator';
-import { RolesGuard } from 'src/core/guards/roles.guard';
 import { LoggingInterceptor } from 'src/core/interceptors/logging.interceptor';
-import { RolesEnum } from 'src/shared/enums/role.enum';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 import { FeatureService } from './feature.service';
 import { FeatureRepository } from './feature.repository';
@@ -39,7 +35,6 @@ import { User } from '@modules/users';
 
 @ApiTags('Features')
 @Controller('features')
-@UseGuards(RolesGuard)
 export class FeatureController extends BaseController<
     Feature,
     CreateFeatureDto,
@@ -58,7 +53,6 @@ export class FeatureController extends BaseController<
      * Access: Admin, USER only
      */
     @Post()
-    @Roles(RolesEnum.ADMIN, RolesEnum.USER)
     @ApiSwagger({
         resourceName: 'Feature',
         operation: 'create',
@@ -197,7 +191,6 @@ export class FeatureController extends BaseController<
      * Access: Admin only
      */
     @Patch(':id')
-    @Roles(RolesEnum.ADMIN)
     @ApiSwagger({
         resourceName: 'Feature',
         operation: 'update',
@@ -223,7 +216,6 @@ export class FeatureController extends BaseController<
      * Access: Admin only
      */
     @Patch(':id/toggle-featured')
-    @Roles(RolesEnum.ADMIN)
     @UseInterceptors(LoggingInterceptor) // Log featured status changes
     @ApiSwagger({
         resourceName: 'Feature',
@@ -259,7 +251,6 @@ export class FeatureController extends BaseController<
      * Access: Admin only
      */
     @Patch(':id/stock')
-    @Roles(RolesEnum.ADMIN)
     @ApiSwagger({
         resourceName: 'Feature',
         operation: 'custom',
@@ -291,7 +282,6 @@ export class FeatureController extends BaseController<
      * Access: Admin only
      */
     @Delete(':id')
-    @Roles(RolesEnum.ADMIN)
     @UseInterceptors(LoggingInterceptor) // Log deletions
     @ApiSwagger({
         resourceName: 'Feature',

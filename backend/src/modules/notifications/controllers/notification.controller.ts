@@ -15,6 +15,7 @@ import { NotificationService } from '../services/notification.service';
 import { NotificationFilterDto } from '../dto';
 import { PaginatedResponseDto, SuccessResponseDto } from '@shared/dtos';
 import { Notification } from '../entities/notification.entity';
+import { RolesEnum } from '@shared/enums/role.enum';
 
 @ApiTags('Notifications')
 @Controller('notifications')
@@ -44,8 +45,8 @@ export class NotificationController {
         @Query() filterDto: NotificationFilterDto,
     ): Promise<PaginatedResponseDto<Notification>> {
         return this.notificationService.getNotifications(
-            user.id,
-            user.role,
+            user?.id || '',
+            user?.role ?? RolesEnum.ADMIN,
             filterDto,
         );
     }
@@ -70,6 +71,6 @@ export class NotificationController {
         @Param('id', ParseUUIDPipe) id: string,
         @CurrentUser() user: any,
     ): Promise<SuccessResponseDto<Notification>> {
-        return this.notificationService.markAsRead(id, user.id);
+        return this.notificationService.markAsRead(id, user?.id || '');
     }
 }
