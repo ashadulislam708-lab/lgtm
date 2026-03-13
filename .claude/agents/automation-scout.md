@@ -1,1 +1,0 @@
-../base/agents/automation-scout.md

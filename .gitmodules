@@ -1,4 +1,4 @@
-[submodule ".claude/nestjs"]
-	path = .claude/nestjs
-	url = https://github.com/potentialInc/claude-nestjs.git
-	branch = main
+[submodule ".claude"]
+	path = .claude
+	url = https://github.com/potentialInc/claude-workflow.git
+	branch = dev
