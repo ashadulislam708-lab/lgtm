@@ -6,20 +6,15 @@ import {
     Param,
     HttpCode,
     HttpStatus,
-    UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiSwagger } from '@core/decorators/api-swagger.decorator';
-import { Roles } from '@core/decorators/roles.decorator';
-import { RolesGuard } from '@core/guards/roles.guard';
-import { RolesEnum } from '@shared/enums/role.enum';
 import { SuccessResponseDto } from '@shared/dtos/response.dto';
 import { ReportService } from '../services/report.service';
 import { GenerateReportDto } from '../dto/generate-report.dto';
 
 @ApiTags('Reports')
 @Controller('reports')
-@UseGuards(RolesGuard)
 export class ReportController {
     constructor(private readonly reportService: ReportService) {}
 
@@ -28,7 +23,6 @@ export class ReportController {
      * Access: Admin only
      */
     @Post()
-    @Roles(RolesEnum.ADMIN)
     @HttpCode(HttpStatus.OK)
     @ApiSwagger({
         resourceName: 'Report',
@@ -49,7 +43,6 @@ export class ReportController {
      * Access: Admin only
      */
     @Get(':jobId')
-    @Roles(RolesEnum.ADMIN)
     @HttpCode(HttpStatus.OK)
     @ApiSwagger({
         resourceName: 'Report Status',

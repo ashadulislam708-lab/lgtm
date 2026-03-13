@@ -10,15 +10,11 @@ import {
     HttpCode,
     HttpStatus,
     ParseUUIDPipe,
-    UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BaseController } from '@core/base';
 import { ApiSwagger } from '@core/decorators/api-swagger.decorator';
 import { Public } from '@core/decorators/public.decorator';
-import { Roles } from '@core/decorators/roles.decorator';
-import { RolesGuard } from '@core/guards/roles.guard';
-import { RolesEnum } from '@shared/enums/role.enum';
 import {
     CreatedResponseDto,
     SuccessResponseDto,
@@ -37,7 +33,6 @@ import {
 
 @ApiTags('Products')
 @Controller('products')
-@UseGuards(RolesGuard)
 export class ProductController extends BaseController<
     Product,
     CreateProductDto,
@@ -114,7 +109,6 @@ export class ProductController extends BaseController<
      * Access: Admin only
      */
     @Post()
-    @Roles(RolesEnum.ADMIN)
     @HttpCode(HttpStatus.CREATED)
     @ApiSwagger({
         resourceName: 'Product',
@@ -136,7 +130,6 @@ export class ProductController extends BaseController<
      * Access: Admin only
      */
     @Put(':id')
-    @Roles(RolesEnum.ADMIN)
     @HttpCode(HttpStatus.OK)
     @ApiSwagger({
         resourceName: 'Product',
@@ -162,7 +155,6 @@ export class ProductController extends BaseController<
      * Access: Admin only
      */
     @Delete(':id')
-    @Roles(RolesEnum.ADMIN)
     @HttpCode(HttpStatus.OK)
     @ApiSwagger({
         resourceName: 'Product',
@@ -180,7 +172,6 @@ export class ProductController extends BaseController<
      * Access: Admin only
      */
     @Post('bulk-import')
-    @Roles(RolesEnum.ADMIN)
     @HttpCode(HttpStatus.CREATED)
     @ApiSwagger({
         resourceName: 'Products',

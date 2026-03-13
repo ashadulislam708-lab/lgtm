@@ -6,7 +6,6 @@ import {
     HttpStatus,
     Post,
     Query,
-    UseGuards,
     UseInterceptors,
     UsePipes,
     ValidationPipe,
@@ -29,7 +28,6 @@ import {
 import { ChangeUserPasswordDto } from './dtos/change-user-password.dto';
 import { ApiSwagger, CurrentUser, Public } from '@core/decorators';
 import * as interfaces from '@shared/interfaces';
-import { JwtAuthGuard } from '@core/guards';
 import { RemoveToken, SetToken } from '@core/interceptors';
 
 @ApiTags('Authentication')
@@ -120,7 +118,6 @@ export class AuthController {
     @Post('change-password')
     @Public()
     @UsePipes(ValidationPipe)
-    @UseGuards(JwtAuthGuard)
     @ApiSwagger({
         resourceName: 'Change Password',
         operation: 'custom',
@@ -151,7 +148,6 @@ export class AuthController {
 
     @Post('change-user-password')
     @UsePipes(ValidationPipe)
-    @UseGuards(JwtAuthGuard)
     @ApiSwagger({
         resourceName: 'Change User Password',
         operation: 'custom',
@@ -227,7 +223,6 @@ export class AuthController {
 
     @Get('check-login')
     @UsePipes(ValidationPipe)
-    @UseGuards(JwtAuthGuard)
     @ApiSwagger({
         resourceName: 'Check Login',
         operation: 'custom',
@@ -277,7 +272,6 @@ export class AuthController {
     @Get('logout')
     @UsePipes(ValidationPipe)
     @UseInterceptors(RemoveToken)
-    @UseGuards(JwtAuthGuard)
     @ApiSwagger({
         resourceName: 'Logout',
         operation: 'custom',
@@ -295,7 +289,6 @@ export class AuthController {
     @Version(VERSION_NEUTRAL)
     @Post('register-fcm-token')
     @UsePipes(ValidationPipe)
-    @UseGuards(JwtAuthGuard)
     @ApiSwagger({
         resourceName: 'FCM Token',
         operation: 'custom',

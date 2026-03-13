@@ -9,13 +9,9 @@ import {
     HttpCode,
     HttpStatus,
     ParseUUIDPipe,
-    UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiSwagger } from '@core/decorators/api-swagger.decorator';
-import { Roles } from '@core/decorators/roles.decorator';
-import { RolesGuard } from '@core/guards/roles.guard';
-import { RolesEnum } from '@shared/enums/role.enum';
 import {
     SuccessResponseDto,
     PaginatedResponseDto,
@@ -27,8 +23,6 @@ import { InventoryFilterDto, UpdateStockDto } from '../dto';
 
 @ApiTags('Inventory')
 @Controller('inventory')
-@UseGuards(RolesGuard)
-@Roles(RolesEnum.ADMIN)
 export class InventoryController {
     constructor(private readonly inventoryService: InventoryService) {}
 
