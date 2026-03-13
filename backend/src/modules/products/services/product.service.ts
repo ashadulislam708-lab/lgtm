@@ -7,7 +7,11 @@ import { BaseService } from '@core/base';
 import { I18nHelper } from '@core/utils/i18n.helper';
 import { Product } from '../entities/product.entity';
 import { ProductRepository } from '../repositories/product.repository';
-import { CreateProductDto, ProductFilterDto, BulkImportProductDto } from '../dto';
+import {
+    CreateProductDto,
+    ProductFilterDto,
+    BulkImportProductDto,
+} from '../dto';
 
 @Injectable()
 export class ProductService extends BaseService<Product> {
@@ -53,7 +57,9 @@ export class ProductService extends BaseService<Product> {
         await this.findByIdOrFail(id);
 
         if (dto.sku) {
-            const existingProduct = await this.productRepository.findBySku(dto.sku);
+            const existingProduct = await this.productRepository.findBySku(
+                dto.sku,
+            );
             if (existingProduct && existingProduct.id !== id) {
                 throw new ConflictException(
                     this.i18nHelper.t('translation.products.error.sku_exists', {
@@ -69,9 +75,10 @@ export class ProductService extends BaseService<Product> {
     /**
      * Bulk import products with error collection
      */
-    async bulkImport(
-        dto: BulkImportProductDto,
-    ): Promise<{ imported: Product[]; errors: { index: number; error: string }[] }> {
+    async bulkImport(dto: BulkImportProductDto): Promise<{
+        imported: Product[];
+        errors: { index: number; error: string }[];
+    }> {
         const imported: Product[] = [];
         const errors: { index: number; error: string }[] = [];
 

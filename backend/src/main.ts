@@ -12,7 +12,6 @@ import {
 } from './core/filters/http-exception.filter';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
 
-
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
         cors: true,

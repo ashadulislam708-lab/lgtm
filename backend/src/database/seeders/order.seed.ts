@@ -26,7 +26,9 @@ function randomBetween(min: number, max: number): number {
 
 function randomDate(monthsBack: number): Date {
     const now = new Date();
-    const past = new Date(now.getTime() - monthsBack * 30 * 24 * 60 * 60 * 1000);
+    const past = new Date(
+        now.getTime() - monthsBack * 30 * 24 * 60 * 60 * 1000,
+    );
     const diff = now.getTime() - past.getTime();
     return new Date(past.getTime() + Math.random() * diff);
 }
@@ -42,8 +44,8 @@ function generateTrackingId(index: number): string {
 
 function pickStatus(): OrderStatusEnum {
     const rand = Math.random();
-    if (rand < 0.40) return OrderStatusEnum.DELIVERED;
-    if (rand < 0.60) return OrderStatusEnum.SHIPPED;
+    if (rand < 0.4) return OrderStatusEnum.DELIVERED;
+    if (rand < 0.6) return OrderStatusEnum.SHIPPED;
     if (rand < 0.75) return OrderStatusEnum.PROCESSING;
     if (rand < 0.85) return OrderStatusEnum.CONFIRMED;
     if (rand < 0.95) return OrderStatusEnum.PENDING;
@@ -60,7 +62,9 @@ function getPaymentStatus(orderStatus: OrderStatusEnum): PaymentStatusEnum {
         case OrderStatusEnum.PROCESSING:
         case OrderStatusEnum.CONFIRMED: {
             const r = Math.random();
-            return r < 0.7 ? PaymentStatusEnum.PAID : PaymentStatusEnum.PROCESSING;
+            return r < 0.7
+                ? PaymentStatusEnum.PAID
+                : PaymentStatusEnum.PROCESSING;
         }
         case OrderStatusEnum.PENDING:
         default:
@@ -86,7 +90,9 @@ export async function seedOrders(
     const orders: Partial<Order>[] = [];
 
     // 4 Deterministic test orders (for API testing)
-    const testCustomer = users.find((u) => u.email === 'test-customer@orderflow.com');
+    const testCustomer = users.find(
+        (u) => u.email === 'test-customer@orderflow.com',
+    );
     if (testCustomer) {
         const now = Date.now();
         orders.push(
@@ -94,8 +100,8 @@ export async function seedOrders(
                 trackingId: 'ORD-TEST-PENDING',
                 userId: testCustomer.id,
                 status: OrderStatusEnum.PENDING,
-                totalAmount: 27.50,
-                taxAmount: 2.50,
+                totalAmount: 27.5,
+                taxAmount: 2.5,
                 shippingAddress: '100 Test St, New York, NY 10001',
                 paymentStatus: PaymentStatusEnum.PENDING,
                 paymentAttempts: 0,
@@ -106,8 +112,8 @@ export async function seedOrders(
                 trackingId: 'ORD-TEST-DELIVERED',
                 userId: testCustomer.id,
                 status: OrderStatusEnum.DELIVERED,
-                totalAmount: 82.50,
-                taxAmount: 7.50,
+                totalAmount: 82.5,
+                taxAmount: 7.5,
                 shippingAddress: '100 Test St, New York, NY 10001',
                 paymentStatus: PaymentStatusEnum.PAID,
                 paymentAttempts: 1,
@@ -118,8 +124,8 @@ export async function seedOrders(
                 trackingId: 'ORD-TEST-CANCELLED',
                 userId: testCustomer.id,
                 status: OrderStatusEnum.CANCELLED,
-                totalAmount: 16.50,
-                taxAmount: 1.50,
+                totalAmount: 16.5,
+                taxAmount: 1.5,
                 shippingAddress: '100 Test St, New York, NY 10001',
                 paymentStatus: PaymentStatusEnum.FAILED,
                 paymentAttempts: 2,
@@ -130,8 +136,8 @@ export async function seedOrders(
                 trackingId: 'ORD-TEST-PROCESSING',
                 userId: testCustomer.id,
                 status: OrderStatusEnum.PROCESSING,
-                totalAmount: 55.00,
-                taxAmount: 5.00,
+                totalAmount: 55.0,
+                taxAmount: 5.0,
                 shippingAddress: '100 Test St, New York, NY 10001',
                 paymentStatus: PaymentStatusEnum.PAID,
                 paymentAttempts: 1,
@@ -142,7 +148,8 @@ export async function seedOrders(
     }
 
     for (let i = 0; i < 1500; i++) {
-        const customer = customers[Math.floor(Math.random() * customers.length)];
+        const customer =
+            customers[Math.floor(Math.random() * customers.length)];
         const status = pickStatus();
         const paymentStatus = getPaymentStatus(status);
         const subtotal = randomBetween(20, 500);
@@ -152,8 +159,8 @@ export async function seedOrders(
             paymentStatus === PaymentStatusEnum.FAILED
                 ? randomBetween(1, 3)
                 : paymentStatus === PaymentStatusEnum.PAID
-                    ? 1
-                    : 0;
+                  ? 1
+                  : 0;
 
         orders.push({
             trackingId: generateTrackingId(i),
@@ -161,7 +168,8 @@ export async function seedOrders(
             status,
             totalAmount,
             taxAmount,
-            shippingAddress: ADDRESSES[Math.floor(Math.random() * ADDRESSES.length)],
+            shippingAddress:
+                ADDRESSES[Math.floor(Math.random() * ADDRESSES.length)],
             paymentStatus,
             paymentAttempts,
             correlationId: randomUUID(),
@@ -176,7 +184,9 @@ export async function seedOrders(
         const created = orderRepository.create(batch);
         const saved = await orderRepository.save(created);
         savedOrders.push(...saved);
-        console.log(`  Orders batch ${Math.floor(i / 300) + 1}/${Math.ceil(orders.length / 300)} inserted`);
+        console.log(
+            `  Orders batch ${Math.floor(i / 300) + 1}/${Math.ceil(orders.length / 300)} inserted`,
+        );
     }
 
     console.log(`Created ${savedOrders.length} orders`);

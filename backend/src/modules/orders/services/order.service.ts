@@ -48,18 +48,23 @@ export class OrderService extends BaseService<Order> {
         // Step 1: Validate all products exist and have sufficient stock
         const productMap = new Map<string, Product>();
         for (const item of dto.items) {
-            const product = await this.productService.findByIdOrFail(item.productId);
+            const product = await this.productService.findByIdOrFail(
+                item.productId,
+            );
             const stockCheck = await this.productService.checkStock(
                 item.productId,
                 item.quantity,
             );
             if (!stockCheck.available) {
                 throw new BadRequestException(
-                    this.i18nHelper.t('translation.orders.error.insufficient_stock', {
-                        product: product.name,
-                        available: stockCheck.currentStock,
-                        requested: item.quantity,
-                    }),
+                    this.i18nHelper.t(
+                        'translation.orders.error.insufficient_stock',
+                        {
+                            product: product.name,
+                            available: stockCheck.currentStock,
+                            requested: item.quantity,
+                        },
+                    ),
                 );
             }
             productMap.set(item.productId, product);
@@ -104,7 +109,8 @@ export class OrderService extends BaseService<Order> {
             for (const item of dto.items) {
                 const product = productMap.get(item.productId)!;
                 const unitPrice = Number(product.price);
-                const totalPrice = Math.round(item.quantity * unitPrice * 100) / 100;
+                const totalPrice =
+                    Math.round(item.quantity * unitPrice * 100) / 100;
 
                 const orderItem = queryRunner.manager.create(OrderItem, {
                     orderId: savedOrder.id,

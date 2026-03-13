@@ -9,10 +9,7 @@ import { ProductsModule } from '../products/products.module';
 import { I18nHelper } from '@core/utils/i18n.helper';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([InventoryLog]),
-        ProductsModule,
-    ],
+    imports: [TypeOrmModule.forFeature([InventoryLog]), ProductsModule],
     controllers: [InventoryController],
     providers: [
         InventoryLogRepository,

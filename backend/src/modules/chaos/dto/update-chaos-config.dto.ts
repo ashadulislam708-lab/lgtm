@@ -16,7 +16,10 @@ class LatencyRangeDto {
     @Min(0)
     min?: number;
 
-    @ApiPropertyOptional({ example: 2000, description: 'Maximum latency in ms' })
+    @ApiPropertyOptional({
+        example: 2000,
+        description: 'Maximum latency in ms',
+    })
     @IsOptional()
     @IsNumber()
     @Min(0)
@@ -61,7 +64,10 @@ class WarehouseApiConfigDto {
 }
 
 class DatabaseChaosConfigDto {
-    @ApiPropertyOptional({ example: false, description: 'Enable slow query simulation' })
+    @ApiPropertyOptional({
+        example: false,
+        description: 'Enable slow query simulation',
+    })
     @IsOptional()
     @IsBoolean()
     slowQueryEnabled?: boolean;
@@ -74,7 +80,10 @@ class DatabaseChaosConfigDto {
 }
 
 class QueueSlowConsumerConfigDto {
-    @ApiPropertyOptional({ example: false, description: 'Enable slow consumer simulation' })
+    @ApiPropertyOptional({
+        example: false,
+        description: 'Enable slow consumer simulation',
+    })
     @IsOptional()
     @IsBoolean()
     enabled?: boolean;

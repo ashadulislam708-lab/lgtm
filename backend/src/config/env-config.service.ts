@@ -52,7 +52,10 @@ class EnvConfigService {
         return {
             AWS_REGION: this.getValue('AWS_REGION', false),
             AWS_ACCESS_KEY_ID: this.getValue('AWS_ACCESS_KEY_ID', false),
-            AWS_SECRET_ACCESS_KEY: this.getValue('AWS_SECRET_ACCESS_KEY', false),
+            AWS_SECRET_ACCESS_KEY: this.getValue(
+                'AWS_SECRET_ACCESS_KEY',
+                false,
+            ),
             AWS_S3_BUCKET: this.getValue('AWS_S3_BUCKET', false),
         };
     }
@@ -80,10 +83,9 @@ class EnvConfigService {
             APPLE_TEAM_ID: this.getValue('APPLE_TEAM_ID', false),
             APPLE_CLIENT_ID: this.getValue('APPLE_CLIENT_ID', false),
             APPLE_KEY_ID: this.getValue('APPLE_KEY_ID', false),
-            APPLE_PRIVATE_KEY: (this.getValue('APPLE_PRIVATE_KEY', false) || '').replace(
-                /\\n/g,
-                '\n',
-            ),
+            APPLE_PRIVATE_KEY: (
+                this.getValue('APPLE_PRIVATE_KEY', false) || ''
+            ).replace(/\\n/g, '\n'),
         };
     }
 
@@ -117,7 +119,8 @@ class EnvConfigService {
 
     public getAuthJWTConfig() {
         return {
-            AUTH_JWT_SECRET: this.getValue('AUTH_JWT_SECRET', false) || 'default-jwt-secret',
+            AUTH_JWT_SECRET:
+                this.getValue('AUTH_JWT_SECRET', false) || 'default-jwt-secret',
             AUTH_TOKEN_COOKIE_NAME: this.getValue('AUTH_TOKEN_COOKIE_NAME'),
             AUTH_TOKEN_EXPIRED_TIME: this.getValue('AUTH_TOKEN_EXPIRED_TIME'),
             AUTH_TOKEN_EXPIRED_TIME_REMEMBER_ME: this.getValue(

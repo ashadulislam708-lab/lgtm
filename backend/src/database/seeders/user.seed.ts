@@ -5,28 +5,116 @@ import { ActiveStatusEnum } from 'src/shared/enums/active-status.enum';
 import * as bcrypt from 'bcrypt';
 
 const FIRST_NAMES = [
-    'James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda',
-    'David', 'Elizabeth', 'William', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica',
-    'Thomas', 'Sarah', 'Christopher', 'Karen', 'Charles', 'Lisa', 'Daniel', 'Nancy',
-    'Matthew', 'Betty', 'Anthony', 'Margaret', 'Mark', 'Sandra', 'Donald', 'Ashley',
-    'Steven', 'Dorothy', 'Paul', 'Kimberly', 'Andrew', 'Emily', 'Joshua', 'Donna',
-    'Kenneth', 'Michelle', 'Kevin', 'Carol', 'Brian', 'Amanda', 'George', 'Melissa',
-    'Timothy', 'Deborah',
+    'James',
+    'Mary',
+    'Robert',
+    'Patricia',
+    'John',
+    'Jennifer',
+    'Michael',
+    'Linda',
+    'David',
+    'Elizabeth',
+    'William',
+    'Barbara',
+    'Richard',
+    'Susan',
+    'Joseph',
+    'Jessica',
+    'Thomas',
+    'Sarah',
+    'Christopher',
+    'Karen',
+    'Charles',
+    'Lisa',
+    'Daniel',
+    'Nancy',
+    'Matthew',
+    'Betty',
+    'Anthony',
+    'Margaret',
+    'Mark',
+    'Sandra',
+    'Donald',
+    'Ashley',
+    'Steven',
+    'Dorothy',
+    'Paul',
+    'Kimberly',
+    'Andrew',
+    'Emily',
+    'Joshua',
+    'Donna',
+    'Kenneth',
+    'Michelle',
+    'Kevin',
+    'Carol',
+    'Brian',
+    'Amanda',
+    'George',
+    'Melissa',
+    'Timothy',
+    'Deborah',
 ];
 
 const LAST_NAMES = [
-    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
-    'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson',
-    'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson',
-    'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson', 'Walker',
-    'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores',
-    'Green', 'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell',
-    'Carter', 'Roberts',
+    'Smith',
+    'Johnson',
+    'Williams',
+    'Brown',
+    'Jones',
+    'Garcia',
+    'Miller',
+    'Davis',
+    'Rodriguez',
+    'Martinez',
+    'Hernandez',
+    'Lopez',
+    'Gonzalez',
+    'Wilson',
+    'Anderson',
+    'Thomas',
+    'Taylor',
+    'Moore',
+    'Jackson',
+    'Martin',
+    'Lee',
+    'Perez',
+    'Thompson',
+    'White',
+    'Harris',
+    'Sanchez',
+    'Clark',
+    'Ramirez',
+    'Lewis',
+    'Robinson',
+    'Walker',
+    'Young',
+    'Allen',
+    'King',
+    'Wright',
+    'Scott',
+    'Torres',
+    'Nguyen',
+    'Hill',
+    'Flores',
+    'Green',
+    'Adams',
+    'Nelson',
+    'Baker',
+    'Hall',
+    'Rivera',
+    'Campbell',
+    'Mitchell',
+    'Carter',
+    'Roberts',
 ];
 
 function randomDate(monthsBack: number): Date {
     const now = new Date();
-    const past = new Date(now.getTime() - monthsBack * 30 * 24 * 60 * 60 * 1000);
+    const past = new Date(
+        now.getTime() - monthsBack * 30 * 24 * 60 * 60 * 1000,
+    );
     const diff = now.getTime() - past.getTime();
     return new Date(past.getTime() + Math.random() * diff);
 }
@@ -68,7 +156,11 @@ export async function seedUsers(dataSource: DataSource): Promise<User[]> {
     );
 
     // 3 Admin users
-    const adminEmails = ['admin@orderflow.com', 'admin2@orderflow.com', 'admin3@orderflow.com'];
+    const adminEmails = [
+        'admin@orderflow.com',
+        'admin2@orderflow.com',
+        'admin3@orderflow.com',
+    ];
     const adminNames = ['Admin User', 'Admin Manager', 'Admin Supervisor'];
     for (let i = 0; i < 3; i++) {
         users.push({
@@ -87,7 +179,8 @@ export async function seedUsers(dataSource: DataSource): Promise<User[]> {
 
     // 50 Customer users
     for (let i = 1; i <= 50; i++) {
-        const firstName = FIRST_NAMES[i - 1] || FIRST_NAMES[i % FIRST_NAMES.length];
+        const firstName =
+            FIRST_NAMES[i - 1] || FIRST_NAMES[i % FIRST_NAMES.length];
         const lastName = LAST_NAMES[i - 1] || LAST_NAMES[i % LAST_NAMES.length];
         users.push({
             email: `customer${i}@test.com`,
@@ -112,6 +205,8 @@ export async function seedUsers(dataSource: DataSource): Promise<User[]> {
         savedUsers.push(...saved);
     }
 
-    console.log(`Created ${savedUsers.length} users (2 test accounts + 3 admins + 50 customers)`);
+    console.log(
+        `Created ${savedUsers.length} users (2 test accounts + 3 admins + 50 customers)`,
+    );
     return savedUsers;
 }

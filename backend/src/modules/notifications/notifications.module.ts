@@ -11,10 +11,7 @@ import { NotificationProcessor } from './processors/notification.processor';
 import { NotificationController } from './controllers/notification.controller';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Notification]),
-        QueueModule,
-    ],
+    imports: [TypeOrmModule.forFeature([Notification]), QueueModule],
     controllers: [NotificationController],
     providers: [
         NotificationRepository,

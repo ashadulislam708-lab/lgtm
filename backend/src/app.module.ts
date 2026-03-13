@@ -96,10 +96,7 @@ import { LanguageEnum } from '@shared/enums';
         ReportsModule,
     ],
     controllers: [AppController],
-    providers: [
-        AppService,
-        JwtStrategy,
-    ],
+    providers: [AppService, JwtStrategy],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

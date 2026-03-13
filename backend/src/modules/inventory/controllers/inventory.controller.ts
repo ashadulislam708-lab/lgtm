@@ -43,7 +43,8 @@ export class InventoryController {
     async getInventory(
         @Query() filterDto: InventoryFilterDto,
     ): Promise<PaginatedResponseDto<Product>> {
-        const { data, total } = await this.inventoryService.getInventory(filterDto);
+        const { data, total } =
+            await this.inventoryService.getInventory(filterDto);
         const page = filterDto.page || 1;
         const limit = filterDto.limit || 10;
 

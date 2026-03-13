@@ -37,9 +37,7 @@ export class NotificationRepository extends BaseRepository<Notification> {
             });
         }
 
-        qb.orderBy(`notification.${sortBy}`, sortOrder)
-            .skip(skip)
-            .take(limit);
+        qb.orderBy(`notification.${sortBy}`, sortOrder).skip(skip).take(limit);
 
         const [data, total] = await qb.getManyAndCount();
         return { data, total };
@@ -57,8 +55,8 @@ export class NotificationRepository extends BaseRepository<Notification> {
         const sortBy = filterDto.sortBy || 'createdAt';
         const sortOrder = filterDto.sortOrder || 'DESC';
 
-        const qb = this.notificationRepository
-            .createQueryBuilder('notification');
+        const qb =
+            this.notificationRepository.createQueryBuilder('notification');
 
         if (filterDto.isRead !== undefined) {
             qb.andWhere('notification.isRead = :isRead', {
@@ -66,9 +64,7 @@ export class NotificationRepository extends BaseRepository<Notification> {
             });
         }
 
-        qb.orderBy(`notification.${sortBy}`, sortOrder)
-            .skip(skip)
-            .take(limit);
+        qb.orderBy(`notification.${sortBy}`, sortOrder).skip(skip).take(limit);
 
         const [data, total] = await qb.getManyAndCount();
         return { data, total };

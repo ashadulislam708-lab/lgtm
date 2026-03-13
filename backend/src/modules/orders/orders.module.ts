@@ -23,12 +23,7 @@ import { QueueModule } from '@infrastructure/queue/queue.module';
         ),
     ],
     controllers: [OrderController],
-    providers: [
-        OrderRepository,
-        OrderItemRepository,
-        OrderService,
-        I18nHelper,
-    ],
+    providers: [OrderRepository, OrderItemRepository, OrderService, I18nHelper],
     exports: [OrderService, OrderRepository],
 })
 export class OrdersModule {}

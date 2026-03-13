@@ -60,7 +60,8 @@ export class ProductController extends BaseController<
     async findAll(
         @Query() filterDto: ProductFilterDto,
     ): Promise<PaginatedResponseDto<Product>> {
-        const { data, total } = await this.productService.getProducts(filterDto);
+        const { data, total } =
+            await this.productService.getProducts(filterDto);
         const page = filterDto.page || 1;
         const limit = filterDto.limit || 10;
 
@@ -121,7 +122,8 @@ export class ProductController extends BaseController<
     async create(
         @Body() createProductDto: CreateProductDto,
     ): Promise<CreatedResponseDto<Product>> {
-        const product = await this.productService.createProduct(createProductDto);
+        const product =
+            await this.productService.createProduct(createProductDto);
         return new CreatedResponseDto(product);
     }
 
@@ -146,7 +148,8 @@ export class ProductController extends BaseController<
             id,
             updateProductDto,
         );
-        const entity = product || (await this.productService.findByIdOrFail(id));
+        const entity =
+            product || (await this.productService.findByIdOrFail(id));
         return new UpdatedResponseDto(entity);
     }
 
@@ -181,9 +184,12 @@ export class ProductController extends BaseController<
         successStatus: 201,
         requiresAuth: true,
     })
-    async bulkImport(
-        @Body() bulkImportDto: BulkImportProductDto,
-    ): Promise<CreatedResponseDto<{ imported: Product[]; errors: { index: number; error: string }[] }>> {
+    async bulkImport(@Body() bulkImportDto: BulkImportProductDto): Promise<
+        CreatedResponseDto<{
+            imported: Product[];
+            errors: { index: number; error: string }[];
+        }>
+    > {
         const result = await this.productService.bulkImport(bulkImportDto);
         return new CreatedResponseDto(result);
     }

@@ -22,7 +22,9 @@ export class MailService implements OnModuleInit {
             await this.transporter.verify();
             return true;
         } catch (error) {
-            this.logger.warn(`Mail server connection failed: ${error.message}. Email sending will not work.`);
+            this.logger.warn(
+                `Mail server connection failed: ${error.message}. Email sending will not work.`,
+            );
             return false;
         }
     }

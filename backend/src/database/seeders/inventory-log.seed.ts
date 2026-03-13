@@ -10,8 +10,8 @@ function randomBetween(min: number, max: number): number {
 
 function pickSource(): InventorySourceEnum {
     const rand = Math.random();
-    if (rand < 0.60) return InventorySourceEnum.SYNC;
-    if (rand < 0.80) return InventorySourceEnum.ORDER;
+    if (rand < 0.6) return InventorySourceEnum.SYNC;
+    if (rand < 0.8) return InventorySourceEnum.ORDER;
     if (rand < 0.95) return InventorySourceEnum.MANUAL;
     return InventorySourceEnum.BULK_IMPORT;
 }
@@ -49,11 +49,17 @@ export async function seedInventoryLogs(
         switch (source) {
             case InventorySourceEnum.ORDER:
                 // Orders reduce quantity by 1-5
-                newQuantity = Math.max(0, previousQuantity - randomBetween(1, 5));
+                newQuantity = Math.max(
+                    0,
+                    previousQuantity - randomBetween(1, 5),
+                );
                 break;
             case InventorySourceEnum.SYNC:
                 // Sync can have small discrepancies
-                syncCorrelationId = syncCorrelationIds[Math.floor(Math.random() * syncCorrelationIds.length)];
+                syncCorrelationId =
+                    syncCorrelationIds[
+                        Math.floor(Math.random() * syncCorrelationIds.length)
+                    ];
                 if (Math.random() < 0.3) {
                     // 30% of sync records have discrepancy
                     discrepancy = randomBetween(-10, 10);
@@ -76,7 +82,9 @@ export async function seedInventoryLogs(
                 newQuantity = previousQuantity;
         }
 
-        const createdAt = new Date(Date.now() - randomBetween(0, 180 * 24 * 60 * 60 * 1000));
+        const createdAt = new Date(
+            Date.now() - randomBetween(0, 180 * 24 * 60 * 60 * 1000),
+        );
 
         logs.push({
             productId: product.id,
@@ -94,7 +102,9 @@ export async function seedInventoryLogs(
         const batch = logs.slice(i, i + 250);
         const created = inventoryLogRepository.create(batch);
         await inventoryLogRepository.save(created);
-        console.log(`  Inventory logs batch ${Math.floor(i / 250) + 1}/${Math.ceil(logs.length / 250)} inserted`);
+        console.log(
+            `  Inventory logs batch ${Math.floor(i / 250) + 1}/${Math.ceil(logs.length / 250)} inserted`,
+        );
     }
 
     console.log(`Created ${logs.length} inventory log records`);
