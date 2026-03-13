@@ -23,7 +23,52 @@ export async function seedOrderItems(
 
     const allItems: Partial<OrderItem>[] = [];
 
+    // Deterministic test order items (for API testing)
+    const testOrders = orders.filter((o) => o.trackingId.startsWith('ORD-TEST-'));
+    const testProductAlpha = products.find((p) => p.sku === 'TEST-PROD-001');
+    const testProductBeta = products.find((p) => p.sku === 'TEST-PROD-002');
+    const testProductGamma = products.find((p) => p.sku === 'TEST-PROD-003');
+
+    for (const testOrder of testOrders) {
+        if (testOrder.trackingId === 'ORD-TEST-PENDING' && testProductAlpha) {
+            allItems.push({
+                orderId: testOrder.id,
+                productId: testProductAlpha.id,
+                quantity: 1,
+                unitPrice: 25.00,
+                totalPrice: 25.00,
+            });
+        } else if (testOrder.trackingId === 'ORD-TEST-DELIVERED' && testProductBeta) {
+            allItems.push({
+                orderId: testOrder.id,
+                productId: testProductBeta.id,
+                quantity: 1,
+                unitPrice: 75.00,
+                totalPrice: 75.00,
+            });
+        } else if (testOrder.trackingId === 'ORD-TEST-CANCELLED' && testProductGamma) {
+            allItems.push({
+                orderId: testOrder.id,
+                productId: testProductGamma.id,
+                quantity: 1,
+                unitPrice: 15.00,
+                totalPrice: 15.00,
+            });
+        } else if (testOrder.trackingId === 'ORD-TEST-PROCESSING' && testProductAlpha) {
+            allItems.push({
+                orderId: testOrder.id,
+                productId: testProductAlpha.id,
+                quantity: 2,
+                unitPrice: 25.00,
+                totalPrice: 50.00,
+            });
+        }
+    }
+
     for (const order of orders) {
+        // Skip test orders (already handled above)
+        if (order.trackingId.startsWith('ORD-TEST-')) continue;
+
         const itemCount = randomBetween(2, 5);
         const usedProductIndices = new Set<number>();
 

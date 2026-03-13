@@ -85,6 +85,62 @@ export async function seedOrders(
 
     const orders: Partial<Order>[] = [];
 
+    // 4 Deterministic test orders (for API testing)
+    const testCustomer = users.find((u) => u.email === 'test-customer@orderflow.com');
+    if (testCustomer) {
+        const now = Date.now();
+        orders.push(
+            {
+                trackingId: 'ORD-TEST-PENDING',
+                userId: testCustomer.id,
+                status: OrderStatusEnum.PENDING,
+                totalAmount: 27.50,
+                taxAmount: 2.50,
+                shippingAddress: '100 Test St, New York, NY 10001',
+                paymentStatus: PaymentStatusEnum.PENDING,
+                paymentAttempts: 0,
+                correlationId: randomUUID(),
+                createdAt: new Date(now - 7 * 24 * 60 * 60 * 1000),
+            },
+            {
+                trackingId: 'ORD-TEST-DELIVERED',
+                userId: testCustomer.id,
+                status: OrderStatusEnum.DELIVERED,
+                totalAmount: 82.50,
+                taxAmount: 7.50,
+                shippingAddress: '100 Test St, New York, NY 10001',
+                paymentStatus: PaymentStatusEnum.PAID,
+                paymentAttempts: 1,
+                correlationId: randomUUID(),
+                createdAt: new Date(now - 30 * 24 * 60 * 60 * 1000),
+            },
+            {
+                trackingId: 'ORD-TEST-CANCELLED',
+                userId: testCustomer.id,
+                status: OrderStatusEnum.CANCELLED,
+                totalAmount: 16.50,
+                taxAmount: 1.50,
+                shippingAddress: '100 Test St, New York, NY 10001',
+                paymentStatus: PaymentStatusEnum.FAILED,
+                paymentAttempts: 2,
+                correlationId: randomUUID(),
+                createdAt: new Date(now - 45 * 24 * 60 * 60 * 1000),
+            },
+            {
+                trackingId: 'ORD-TEST-PROCESSING',
+                userId: testCustomer.id,
+                status: OrderStatusEnum.PROCESSING,
+                totalAmount: 55.00,
+                taxAmount: 5.00,
+                shippingAddress: '100 Test St, New York, NY 10001',
+                paymentStatus: PaymentStatusEnum.PAID,
+                paymentAttempts: 1,
+                correlationId: randomUUID(),
+                createdAt: new Date(now - 14 * 24 * 60 * 60 * 1000),
+            },
+        );
+    }
+
     for (let i = 0; i < 1500; i++) {
         const customer = customers[Math.floor(Math.random() * customers.length)];
         const status = pickStatus();

@@ -96,6 +96,92 @@ export async function seedNotifications(
 
     const notifications: Partial<Notification>[] = [];
 
+    // Deterministic test notifications (for API testing)
+    const testCustomer = users.find((u) => u.email === 'test-customer@orderflow.com');
+    const testOrderPending = orders.find((o) => o.trackingId === 'ORD-TEST-PENDING');
+    const testOrderDelivered = orders.find((o) => o.trackingId === 'ORD-TEST-DELIVERED');
+    const testOrderCancelled = orders.find((o) => o.trackingId === 'ORD-TEST-CANCELLED');
+
+    if (testCustomer) {
+        if (testOrderPending) {
+            notifications.push({
+                userId: testCustomer.id,
+                type: NotificationTypeEnum.ORDER_PLACED,
+                title: 'Order Placed Successfully',
+                message: 'Your order ORD-TEST-PENDING has been placed successfully and is being processed.',
+                isRead: false,
+                metadata: { orderId: testOrderPending.id, trackingId: testOrderPending.trackingId },
+                createdAt: testOrderPending.createdAt,
+            });
+        }
+
+        if (testOrderDelivered) {
+            const deliveredDate = new Date(testOrderDelivered.createdAt);
+            notifications.push(
+                {
+                    userId: testCustomer.id,
+                    type: NotificationTypeEnum.ORDER_PLACED,
+                    title: 'Order Placed Successfully',
+                    message: 'Your order ORD-TEST-DELIVERED has been placed successfully.',
+                    isRead: true,
+                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
+                    createdAt: deliveredDate,
+                },
+                {
+                    userId: testCustomer.id,
+                    type: NotificationTypeEnum.PAYMENT_SUCCESS,
+                    title: 'Payment Confirmed',
+                    message: 'Payment for order ORD-TEST-DELIVERED has been processed successfully.',
+                    isRead: true,
+                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
+                    createdAt: new Date(deliveredDate.getTime() + 60000),
+                },
+                {
+                    userId: testCustomer.id,
+                    type: NotificationTypeEnum.ORDER_SHIPPED,
+                    title: 'Order Shipped',
+                    message: 'Your order ORD-TEST-DELIVERED has been shipped and is on its way.',
+                    isRead: true,
+                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
+                    createdAt: new Date(deliveredDate.getTime() + 2 * 24 * 60 * 60 * 1000),
+                },
+                {
+                    userId: testCustomer.id,
+                    type: NotificationTypeEnum.ORDER_DELIVERED,
+                    title: 'Order Delivered',
+                    message: 'Your order ORD-TEST-DELIVERED has been delivered. Enjoy!',
+                    isRead: true,
+                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
+                    createdAt: new Date(deliveredDate.getTime() + 5 * 24 * 60 * 60 * 1000),
+                },
+            );
+        }
+
+        if (testOrderCancelled) {
+            const cancelledDate = new Date(testOrderCancelled.createdAt);
+            notifications.push(
+                {
+                    userId: testCustomer.id,
+                    type: NotificationTypeEnum.ORDER_PLACED,
+                    title: 'Order Placed Successfully',
+                    message: 'Your order ORD-TEST-CANCELLED has been placed.',
+                    isRead: false,
+                    metadata: { orderId: testOrderCancelled.id, trackingId: testOrderCancelled.trackingId },
+                    createdAt: cancelledDate,
+                },
+                {
+                    userId: testCustomer.id,
+                    type: NotificationTypeEnum.PAYMENT_FAILED,
+                    title: 'Payment Failed',
+                    message: 'Payment for order ORD-TEST-CANCELLED could not be processed.',
+                    isRead: false,
+                    metadata: { orderId: testOrderCancelled.id, trackingId: testOrderCancelled.trackingId },
+                    createdAt: new Date(cancelledDate.getTime() + 60000),
+                },
+            );
+        }
+    }
+
     for (let i = 0; i < 3000; i++) {
         const user = usersWithOrders[Math.floor(Math.random() * usersWithOrders.length)];
         const userOrders = userOrderMap.get(user.id) || [];

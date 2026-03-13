@@ -70,9 +70,72 @@ export async function seedPayments(
     const payments: Partial<Payment>[] = [];
     let totalCreated = 0;
 
+    // Deterministic test payments (for API testing)
+    const testDelivered = orders.find((o) => o.trackingId === 'ORD-TEST-DELIVERED');
+    const testCancelled = orders.find((o) => o.trackingId === 'ORD-TEST-CANCELLED');
+    const testProcessing = orders.find((o) => o.trackingId === 'ORD-TEST-PROCESSING');
+
+    if (testDelivered) {
+        payments.push({
+            orderId: testDelivered.id,
+            amount: 82.50,
+            status: PaymentStatusEnum.PAID,
+            gatewayResponse: { transactionId: 'TXN-TEST-DELIVERED', gateway: 'stripe', approvalCode: '100001' },
+            attemptNumber: 1,
+            errorMessage: null,
+            processingTime: 1200,
+            correlationId: testDelivered.correlationId,
+            createdAt: testDelivered.createdAt,
+        });
+        totalCreated++;
+    }
+
+    if (testCancelled) {
+        payments.push(
+            {
+                orderId: testCancelled.id,
+                amount: 16.50,
+                status: PaymentStatusEnum.FAILED,
+                gatewayResponse: { errorCode: 'CARD_DECLINED', gateway: 'stripe', message: 'Payment was declined by the issuing bank' },
+                attemptNumber: 1,
+                errorMessage: 'Payment declined by issuing bank',
+                processingTime: 950,
+                correlationId: testCancelled.correlationId,
+                createdAt: testCancelled.createdAt,
+            },
+            {
+                orderId: testCancelled.id,
+                amount: 16.50,
+                status: PaymentStatusEnum.FAILED,
+                gatewayResponse: { errorCode: 'INSUFFICIENT_FUNDS', gateway: 'stripe', message: 'Insufficient funds in account' },
+                attemptNumber: 2,
+                errorMessage: 'Payment declined on retry - insufficient funds',
+                processingTime: 1100,
+                correlationId: testCancelled.correlationId,
+                createdAt: new Date(new Date(testCancelled.createdAt).getTime() + 3600000),
+            },
+        );
+        totalCreated += 2;
+    }
+
+    if (testProcessing) {
+        payments.push({
+            orderId: testProcessing.id,
+            amount: 55.00,
+            status: PaymentStatusEnum.PAID,
+            gatewayResponse: { transactionId: 'TXN-TEST-PROCESSING', gateway: 'stripe', approvalCode: '100002' },
+            attemptNumber: 1,
+            errorMessage: null,
+            processingTime: 800,
+            correlationId: testProcessing.correlationId,
+            createdAt: testProcessing.createdAt,
+        });
+        totalCreated++;
+    }
+
     // Shuffle orders and pick enough to reach ~1800 payments
     // Most orders get 1 payment, some get retries (2-3 payments)
-    const shuffledOrders = [...orders].sort(() => Math.random() - 0.5);
+    const shuffledOrders = [...orders].filter((o) => !o.trackingId.startsWith('ORD-TEST-')).sort(() => Math.random() - 0.5);
 
     for (const order of shuffledOrders) {
         if (totalCreated >= 1800) break;
