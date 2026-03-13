@@ -18,9 +18,7 @@ interface NotificationJobData {
 export class NotificationProcessor extends WorkerHost {
     private readonly logger = new Logger(NotificationProcessor.name);
 
-    constructor(
-        private readonly notificationService: NotificationService,
-    ) {
+    constructor(private readonly notificationService: NotificationService) {
         super();
     }
 

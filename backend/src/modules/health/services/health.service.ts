@@ -19,10 +19,8 @@ export class HealthService {
     async check(): Promise<HealthCheckResult> {
         return this.health.check([
             () => this.db.pingCheck('database'),
-            () =>
-                this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
-            () =>
-                this.memory.checkRSS('memory_rss', 300 * 1024 * 1024),
+            () => this.memory.checkHeap('memory_heap', 150 * 1024 * 1024),
+            () => this.memory.checkRSS('memory_rss', 300 * 1024 * 1024),
             () =>
                 this.disk.checkStorage('disk', {
                     thresholdPercent: 0.9,
@@ -32,9 +30,7 @@ export class HealthService {
     }
 
     async checkReadiness(): Promise<HealthCheckResult> {
-        return this.health.check([
-            () => this.db.pingCheck('database'),
-        ]);
+        return this.health.check([() => this.db.pingCheck('database')]);
     }
 
     checkLiveness(): { status: string } {

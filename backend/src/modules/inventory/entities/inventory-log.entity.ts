@@ -43,7 +43,8 @@ export class InventoryLog extends BaseEntity {
 
     @ApiPropertyOptional({
         example: -5,
-        description: 'Discrepancy between expected and actual quantity during sync',
+        description:
+            'Discrepancy between expected and actual quantity during sync',
     })
     @Column({ type: 'int', nullable: true })
     discrepancy?: number;

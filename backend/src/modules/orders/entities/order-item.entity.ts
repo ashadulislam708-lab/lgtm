@@ -1,9 +1,4 @@
-import {
-    Entity,
-    Column,
-    ManyToOne,
-    JoinColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '@core/base/base.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Order } from './order.entity';

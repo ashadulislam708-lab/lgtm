@@ -90,13 +90,16 @@ export class InventoryService {
 
         let stockLevels;
         try {
-            stockLevels = await this.warehouseApiService.getStockLevels(products);
+            stockLevels =
+                await this.warehouseApiService.getStockLevels(products);
         } catch (error) {
             this.logger.error(
                 `Inventory sync failed: ${(error as Error).message}`,
             );
             throw new InternalServerErrorException(
-                this.i18nHelper.t('translation.inventory.error.warehouse_timeout'),
+                this.i18nHelper.t(
+                    'translation.inventory.error.warehouse_timeout',
+                ),
             );
         }
 
@@ -121,7 +124,8 @@ export class InventoryService {
                 }
 
                 if (warehouseQuantity !== product.stockQuantity) {
-                    const discrepancy = warehouseQuantity - product.stockQuantity;
+                    const discrepancy =
+                        warehouseQuantity - product.stockQuantity;
 
                     const log = queryRunner.manager.create(InventoryLog, {
                         productId: product.id,
@@ -184,7 +188,9 @@ export class InventoryService {
 
         if (!product) {
             throw new NotFoundException(
-                this.i18nHelper.t('translation.inventory.error.product_not_found'),
+                this.i18nHelper.t(
+                    'translation.inventory.error.product_not_found',
+                ),
             );
         }
 

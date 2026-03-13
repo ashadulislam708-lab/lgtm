@@ -24,7 +24,9 @@ export async function seedOrderItems(
     const allItems: Partial<OrderItem>[] = [];
 
     // Deterministic test order items (for API testing)
-    const testOrders = orders.filter((o) => o.trackingId.startsWith('ORD-TEST-'));
+    const testOrders = orders.filter((o) =>
+        o.trackingId.startsWith('ORD-TEST-'),
+    );
     const testProductAlpha = products.find((p) => p.sku === 'TEST-PROD-001');
     const testProductBeta = products.find((p) => p.sku === 'TEST-PROD-002');
     const testProductGamma = products.find((p) => p.sku === 'TEST-PROD-003');
@@ -35,32 +37,41 @@ export async function seedOrderItems(
                 orderId: testOrder.id,
                 productId: testProductAlpha.id,
                 quantity: 1,
-                unitPrice: 25.00,
-                totalPrice: 25.00,
+                unitPrice: 25.0,
+                totalPrice: 25.0,
             });
-        } else if (testOrder.trackingId === 'ORD-TEST-DELIVERED' && testProductBeta) {
+        } else if (
+            testOrder.trackingId === 'ORD-TEST-DELIVERED' &&
+            testProductBeta
+        ) {
             allItems.push({
                 orderId: testOrder.id,
                 productId: testProductBeta.id,
                 quantity: 1,
-                unitPrice: 75.00,
-                totalPrice: 75.00,
+                unitPrice: 75.0,
+                totalPrice: 75.0,
             });
-        } else if (testOrder.trackingId === 'ORD-TEST-CANCELLED' && testProductGamma) {
+        } else if (
+            testOrder.trackingId === 'ORD-TEST-CANCELLED' &&
+            testProductGamma
+        ) {
             allItems.push({
                 orderId: testOrder.id,
                 productId: testProductGamma.id,
                 quantity: 1,
-                unitPrice: 15.00,
-                totalPrice: 15.00,
+                unitPrice: 15.0,
+                totalPrice: 15.0,
             });
-        } else if (testOrder.trackingId === 'ORD-TEST-PROCESSING' && testProductAlpha) {
+        } else if (
+            testOrder.trackingId === 'ORD-TEST-PROCESSING' &&
+            testProductAlpha
+        ) {
             allItems.push({
                 orderId: testOrder.id,
                 productId: testProductAlpha.id,
                 quantity: 2,
-                unitPrice: 25.00,
-                totalPrice: 50.00,
+                unitPrice: 25.0,
+                totalPrice: 50.0,
             });
         }
     }
@@ -76,7 +87,10 @@ export async function seedOrderItems(
             let productIndex: number;
             do {
                 productIndex = Math.floor(Math.random() * products.length);
-            } while (usedProductIndices.has(productIndex) && usedProductIndices.size < products.length);
+            } while (
+                usedProductIndices.has(productIndex) &&
+                usedProductIndices.size < products.length
+            );
             usedProductIndices.add(productIndex);
 
             const product = products[productIndex];
@@ -102,7 +116,9 @@ export async function seedOrderItems(
         const saved = await orderItemRepository.save(created);
         savedItems.push(...saved);
         if ((i / 500) % 3 === 0) {
-            console.log(`  Order items batch ${Math.floor(i / 500) + 1}/${Math.ceil(allItems.length / 500)} inserted`);
+            console.log(
+                `  Order items batch ${Math.floor(i / 500) + 1}/${Math.ceil(allItems.length / 500)} inserted`,
+            );
         }
     }
 

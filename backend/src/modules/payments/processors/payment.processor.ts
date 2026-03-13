@@ -82,7 +82,10 @@ export class PaymentProcessor extends WorkerHost {
 
         // Call the payment gateway (outside the transaction)
         try {
-            const result = await this.paymentGatewayService.charge(amount, correlationId);
+            const result = await this.paymentGatewayService.charge(
+                amount,
+                correlationId,
+            );
 
             if (result.success) {
                 // Payment succeeded
@@ -97,7 +100,11 @@ export class PaymentProcessor extends WorkerHost {
                 });
 
                 await this.notificationQueue.add('send-notification', {
-                    userId: (await this.dataSource.manager.findOne(Order, { where: { id: orderId } }))?.userId,
+                    userId: (
+                        await this.dataSource.manager.findOne(Order, {
+                            where: { id: orderId },
+                        })
+                    )?.userId,
                     type: 'payment_success',
                     title: 'Payment Successful',
                     message: `Payment of ${amount} processed successfully`,
@@ -120,11 +127,20 @@ export class PaymentProcessor extends WorkerHost {
                 } as any);
 
                 await this.notificationQueue.add('send-notification', {
-                    userId: (await this.dataSource.manager.findOne(Order, { where: { id: orderId } }))?.userId,
+                    userId: (
+                        await this.dataSource.manager.findOne(Order, {
+                            where: { id: orderId },
+                        })
+                    )?.userId,
                     type: 'payment_failed',
                     title: 'Payment Failed',
                     message: `Payment of ${amount} failed: ${result.message}`,
-                    metadata: { orderId, amount, correlationId, errorCode: result.errorCode },
+                    metadata: {
+                        orderId,
+                        amount,
+                        correlationId,
+                        errorCode: result.errorCode,
+                    },
                 });
 
                 this.logger.warn(
@@ -133,7 +149,9 @@ export class PaymentProcessor extends WorkerHost {
 
                 // Retry if under max attempts
                 if (attemptNumber < 3) {
-                    throw new Error(`Payment declined for order ${orderId}, retrying...`);
+                    throw new Error(
+                        `Payment declined for order ${orderId}, retrying...`,
+                    );
                 }
             }
         } catch (error) {

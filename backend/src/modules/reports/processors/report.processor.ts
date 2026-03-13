@@ -16,9 +16,7 @@ interface ReportJobData {
 export class ReportProcessor extends WorkerHost {
     private readonly logger = new Logger(ReportProcessor.name);
 
-    constructor(
-        private readonly reportService: ReportService,
-    ) {
+    constructor(private readonly reportService: ReportService) {
         super();
     }
 

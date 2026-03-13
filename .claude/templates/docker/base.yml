@@ -1,3 +1,0 @@
-# META: volumes=[]
-# Network-only template. No services defined here.
-# Ensures the network block is always generated.

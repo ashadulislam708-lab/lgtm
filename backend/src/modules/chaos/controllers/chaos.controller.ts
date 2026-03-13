@@ -18,7 +18,9 @@ export class ChaosController {
 
     @Post('config')
     updateConfig(@Body() dto: UpdateChaosConfigDto): ChaosConfig {
-        this.logger.warn(`Chaos config update requested: ${JSON.stringify(dto)}`);
+        this.logger.warn(
+            `Chaos config update requested: ${JSON.stringify(dto)}`,
+        );
         return this.chaosConfigService.setConfig(dto);
     }
 

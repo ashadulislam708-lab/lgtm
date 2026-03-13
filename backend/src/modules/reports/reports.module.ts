@@ -6,15 +6,9 @@ import { ReportProcessor } from './processors/report.processor';
 import { ReportController } from './controllers/report.controller';
 
 @Module({
-    imports: [
-        QueueModule,
-    ],
+    imports: [QueueModule],
     controllers: [ReportController],
-    providers: [
-        ReportService,
-        ReportProcessor,
-        I18nHelper,
-    ],
+    providers: [ReportService, ReportProcessor, I18nHelper],
     exports: [ReportService],
 })
 export class ReportsModule {}

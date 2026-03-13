@@ -8,9 +8,16 @@ function randomBetween(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const NOTIFICATION_TEMPLATES: Record<NotificationTypeEnum, { titles: string[]; messages: string[] }> = {
+const NOTIFICATION_TEMPLATES: Record<
+    NotificationTypeEnum,
+    { titles: string[]; messages: string[] }
+> = {
     [NotificationTypeEnum.ORDER_PLACED]: {
-        titles: ['Order Placed Successfully', 'New Order Confirmed', 'Order Received'],
+        titles: [
+            'Order Placed Successfully',
+            'New Order Confirmed',
+            'Order Received',
+        ],
         messages: [
             'Your order has been placed successfully and is being processed.',
             'We have received your order. You will be notified when it ships.',
@@ -34,7 +41,11 @@ const NOTIFICATION_TEMPLATES: Record<NotificationTypeEnum, { titles: string[]; m
         ],
     },
     [NotificationTypeEnum.ORDER_SHIPPED]: {
-        titles: ['Order Shipped', 'Your Order is On Its Way', 'Shipment Confirmation'],
+        titles: [
+            'Order Shipped',
+            'Your Order is On Its Way',
+            'Shipment Confirmation',
+        ],
         messages: [
             'Your order has been shipped and is on its way to you.',
             'Great news! Your order has left our warehouse.',
@@ -50,7 +61,11 @@ const NOTIFICATION_TEMPLATES: Record<NotificationTypeEnum, { titles: string[]; m
         ],
     },
     [NotificationTypeEnum.ORDER_DELIVERED]: {
-        titles: ['Order Delivered', 'Package Delivered', 'Delivery Confirmation'],
+        titles: [
+            'Order Delivered',
+            'Package Delivered',
+            'Delivery Confirmation',
+        ],
         messages: [
             'Your order has been delivered. Enjoy!',
             'Your package has been delivered to your address.',
@@ -62,7 +77,9 @@ const NOTIFICATION_TEMPLATES: Record<NotificationTypeEnum, { titles: string[]; m
 const NOTIFICATION_TYPES = Object.values(NotificationTypeEnum);
 
 function pickNotificationType(): NotificationTypeEnum {
-    return NOTIFICATION_TYPES[Math.floor(Math.random() * NOTIFICATION_TYPES.length)];
+    return NOTIFICATION_TYPES[
+        Math.floor(Math.random() * NOTIFICATION_TYPES.length)
+    ];
 }
 
 export async function seedNotifications(
@@ -90,17 +107,27 @@ export async function seedNotifications(
     // Only users who have orders
     const usersWithOrders = users.filter((u) => userOrderMap.has(u.id));
     if (usersWithOrders.length === 0) {
-        console.log('No users with orders found, skipping notification seeding');
+        console.log(
+            'No users with orders found, skipping notification seeding',
+        );
         return;
     }
 
     const notifications: Partial<Notification>[] = [];
 
     // Deterministic test notifications (for API testing)
-    const testCustomer = users.find((u) => u.email === 'test-customer@orderflow.com');
-    const testOrderPending = orders.find((o) => o.trackingId === 'ORD-TEST-PENDING');
-    const testOrderDelivered = orders.find((o) => o.trackingId === 'ORD-TEST-DELIVERED');
-    const testOrderCancelled = orders.find((o) => o.trackingId === 'ORD-TEST-CANCELLED');
+    const testCustomer = users.find(
+        (u) => u.email === 'test-customer@orderflow.com',
+    );
+    const testOrderPending = orders.find(
+        (o) => o.trackingId === 'ORD-TEST-PENDING',
+    );
+    const testOrderDelivered = orders.find(
+        (o) => o.trackingId === 'ORD-TEST-DELIVERED',
+    );
+    const testOrderCancelled = orders.find(
+        (o) => o.trackingId === 'ORD-TEST-CANCELLED',
+    );
 
     if (testCustomer) {
         if (testOrderPending) {
@@ -108,9 +135,13 @@ export async function seedNotifications(
                 userId: testCustomer.id,
                 type: NotificationTypeEnum.ORDER_PLACED,
                 title: 'Order Placed Successfully',
-                message: 'Your order ORD-TEST-PENDING has been placed successfully and is being processed.',
+                message:
+                    'Your order ORD-TEST-PENDING has been placed successfully and is being processed.',
                 isRead: false,
-                metadata: { orderId: testOrderPending.id, trackingId: testOrderPending.trackingId },
+                metadata: {
+                    orderId: testOrderPending.id,
+                    trackingId: testOrderPending.trackingId,
+                },
                 createdAt: testOrderPending.createdAt,
             });
         }
@@ -122,37 +153,57 @@ export async function seedNotifications(
                     userId: testCustomer.id,
                     type: NotificationTypeEnum.ORDER_PLACED,
                     title: 'Order Placed Successfully',
-                    message: 'Your order ORD-TEST-DELIVERED has been placed successfully.',
+                    message:
+                        'Your order ORD-TEST-DELIVERED has been placed successfully.',
                     isRead: true,
-                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
+                    metadata: {
+                        orderId: testOrderDelivered.id,
+                        trackingId: testOrderDelivered.trackingId,
+                    },
                     createdAt: deliveredDate,
                 },
                 {
                     userId: testCustomer.id,
                     type: NotificationTypeEnum.PAYMENT_SUCCESS,
                     title: 'Payment Confirmed',
-                    message: 'Payment for order ORD-TEST-DELIVERED has been processed successfully.',
+                    message:
+                        'Payment for order ORD-TEST-DELIVERED has been processed successfully.',
                     isRead: true,
-                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
+                    metadata: {
+                        orderId: testOrderDelivered.id,
+                        trackingId: testOrderDelivered.trackingId,
+                    },
                     createdAt: new Date(deliveredDate.getTime() + 60000),
                 },
                 {
                     userId: testCustomer.id,
                     type: NotificationTypeEnum.ORDER_SHIPPED,
                     title: 'Order Shipped',
-                    message: 'Your order ORD-TEST-DELIVERED has been shipped and is on its way.',
+                    message:
+                        'Your order ORD-TEST-DELIVERED has been shipped and is on its way.',
                     isRead: true,
-                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
-                    createdAt: new Date(deliveredDate.getTime() + 2 * 24 * 60 * 60 * 1000),
+                    metadata: {
+                        orderId: testOrderDelivered.id,
+                        trackingId: testOrderDelivered.trackingId,
+                    },
+                    createdAt: new Date(
+                        deliveredDate.getTime() + 2 * 24 * 60 * 60 * 1000,
+                    ),
                 },
                 {
                     userId: testCustomer.id,
                     type: NotificationTypeEnum.ORDER_DELIVERED,
                     title: 'Order Delivered',
-                    message: 'Your order ORD-TEST-DELIVERED has been delivered. Enjoy!',
+                    message:
+                        'Your order ORD-TEST-DELIVERED has been delivered. Enjoy!',
                     isRead: true,
-                    metadata: { orderId: testOrderDelivered.id, trackingId: testOrderDelivered.trackingId },
-                    createdAt: new Date(deliveredDate.getTime() + 5 * 24 * 60 * 60 * 1000),
+                    metadata: {
+                        orderId: testOrderDelivered.id,
+                        trackingId: testOrderDelivered.trackingId,
+                    },
+                    createdAt: new Date(
+                        deliveredDate.getTime() + 5 * 24 * 60 * 60 * 1000,
+                    ),
                 },
             );
         }
@@ -166,16 +217,23 @@ export async function seedNotifications(
                     title: 'Order Placed Successfully',
                     message: 'Your order ORD-TEST-CANCELLED has been placed.',
                     isRead: false,
-                    metadata: { orderId: testOrderCancelled.id, trackingId: testOrderCancelled.trackingId },
+                    metadata: {
+                        orderId: testOrderCancelled.id,
+                        trackingId: testOrderCancelled.trackingId,
+                    },
                     createdAt: cancelledDate,
                 },
                 {
                     userId: testCustomer.id,
                     type: NotificationTypeEnum.PAYMENT_FAILED,
                     title: 'Payment Failed',
-                    message: 'Payment for order ORD-TEST-CANCELLED could not be processed.',
+                    message:
+                        'Payment for order ORD-TEST-CANCELLED could not be processed.',
                     isRead: false,
-                    metadata: { orderId: testOrderCancelled.id, trackingId: testOrderCancelled.trackingId },
+                    metadata: {
+                        orderId: testOrderCancelled.id,
+                        trackingId: testOrderCancelled.trackingId,
+                    },
                     createdAt: new Date(cancelledDate.getTime() + 60000),
                 },
             );
@@ -183,16 +241,22 @@ export async function seedNotifications(
     }
 
     for (let i = 0; i < 3000; i++) {
-        const user = usersWithOrders[Math.floor(Math.random() * usersWithOrders.length)];
+        const user =
+            usersWithOrders[Math.floor(Math.random() * usersWithOrders.length)];
         const userOrders = userOrderMap.get(user.id) || [];
-        const order = userOrders.length > 0
-            ? userOrders[Math.floor(Math.random() * userOrders.length)]
-            : null;
+        const order =
+            userOrders.length > 0
+                ? userOrders[Math.floor(Math.random() * userOrders.length)]
+                : null;
 
         const type = pickNotificationType();
         const template = NOTIFICATION_TEMPLATES[type];
-        const title = template.titles[Math.floor(Math.random() * template.titles.length)];
-        const message = template.messages[Math.floor(Math.random() * template.messages.length)];
+        const title =
+            template.titles[Math.floor(Math.random() * template.titles.length)];
+        const message =
+            template.messages[
+                Math.floor(Math.random() * template.messages.length)
+            ];
         const isRead = Math.random() < 0.4;
 
         const metadata: Record<string, any> = {};
@@ -202,8 +266,13 @@ export async function seedNotifications(
         }
 
         const createdAt = order
-            ? new Date(new Date(order.createdAt).getTime() + randomBetween(0, 86400000))
-            : new Date(Date.now() - randomBetween(0, 180 * 24 * 60 * 60 * 1000));
+            ? new Date(
+                  new Date(order.createdAt).getTime() +
+                      randomBetween(0, 86400000),
+              )
+            : new Date(
+                  Date.now() - randomBetween(0, 180 * 24 * 60 * 60 * 1000),
+              );
 
         notifications.push({
             userId: user.id,
@@ -221,7 +290,9 @@ export async function seedNotifications(
         const batch = notifications.slice(i, i + 500);
         const created = notificationRepository.create(batch);
         await notificationRepository.save(created);
-        console.log(`  Notifications batch ${Math.floor(i / 500) + 1}/${Math.ceil(notifications.length / 500)} inserted`);
+        console.log(
+            `  Notifications batch ${Math.floor(i / 500) + 1}/${Math.ceil(notifications.length / 500)} inserted`,
+        );
     }
 
     console.log(`Created ${notifications.length} notifications`);

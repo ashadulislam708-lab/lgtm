@@ -50,7 +50,10 @@ export class OrderController {
         @CurrentUser('id') userId: string | undefined,
         @Body() createOrderDto: CreateOrderDto,
     ): Promise<CreatedResponseDto<Order>> {
-        const order = await this.orderService.placeOrder(userId || 'anonymous', createOrderDto);
+        const order = await this.orderService.placeOrder(
+            userId || 'anonymous',
+            createOrderDto,
+        );
         return new CreatedResponseDto(order, 'Order placed successfully');
     }
 
@@ -101,7 +104,11 @@ export class OrderController {
         @CurrentUser('id') userId: string | undefined,
         @CurrentUser('role') role: RolesEnum | undefined,
     ): Promise<SuccessResponseDto<Order>> {
-        const order = await this.orderService.getOrderById(id, userId || '', role ?? RolesEnum.ADMIN);
+        const order = await this.orderService.getOrderById(
+            id,
+            userId || '',
+            role ?? RolesEnum.ADMIN,
+        );
         return new SuccessResponseDto(order, 'Order retrieved successfully');
     }
 
@@ -122,7 +129,13 @@ export class OrderController {
         @Param('id', ParseUUIDPipe) id: string,
         @Body() updateStatusDto: UpdateOrderStatusDto,
     ): Promise<UpdatedResponseDto<Order>> {
-        const order = await this.orderService.updateOrderStatus(id, updateStatusDto);
-        return new UpdatedResponseDto(order, 'Order status updated successfully');
+        const order = await this.orderService.updateOrderStatus(
+            id,
+            updateStatusDto,
+        );
+        return new UpdatedResponseDto(
+            order,
+            'Order status updated successfully',
+        );
     }
 }

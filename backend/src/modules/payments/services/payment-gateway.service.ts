@@ -12,14 +12,15 @@ export interface GatewayChargeResult {
 
 @Injectable()
 export class PaymentGatewayService {
-    constructor(
-        private readonly chaosConfigService: ChaosConfigService,
-    ) {}
+    constructor(private readonly chaosConfigService: ChaosConfigService) {}
 
     /**
      * Simulate an external payment gateway charge
      */
-    async charge(amount: number, correlationId: string): Promise<GatewayChargeResult> {
+    async charge(
+        amount: number,
+        correlationId: string,
+    ): Promise<GatewayChargeResult> {
         const config = this.chaosConfigService.getPaymentGatewayConfig();
 
         // Calculate random latency

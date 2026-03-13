@@ -11,9 +11,7 @@ export interface WarehouseStockLevel {
 export class WarehouseApiService {
     private readonly logger = new Logger(WarehouseApiService.name);
 
-    constructor(
-        private readonly chaosConfigService: ChaosConfigService,
-    ) {}
+    constructor(private readonly chaosConfigService: ChaosConfigService) {}
 
     /**
      * Simulate fetching stock levels from an external warehouse API.
@@ -44,7 +42,8 @@ export class WarehouseApiService {
 
         return products.map((product) => ({
             sku: product.sku,
-            quantity: product.stockQuantity + Math.floor(Math.random() * 11) - 5,
+            quantity:
+                product.stockQuantity + Math.floor(Math.random() * 11) - 5,
         }));
     }
 }

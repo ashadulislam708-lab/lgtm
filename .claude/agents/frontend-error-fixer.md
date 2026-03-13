@@ -1,1 +1,0 @@
-../react/agents/frontend-error-fixer.md

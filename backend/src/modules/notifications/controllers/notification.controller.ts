@@ -20,9 +20,7 @@ import { RolesEnum } from '@shared/enums/role.enum';
 @ApiTags('Notifications')
 @Controller('notifications')
 export class NotificationController {
-    constructor(
-        private readonly notificationService: NotificationService,
-    ) {}
+    constructor(private readonly notificationService: NotificationService) {}
 
     /**
      * Get notifications
@@ -36,9 +34,7 @@ export class NotificationController {
         operation: 'getAll',
         isArray: true,
         withPagination: true,
-        errors: [
-            { status: 401, description: 'Unauthorized' },
-        ],
+        errors: [{ status: 401, description: 'Unauthorized' }],
     })
     async getNotifications(
         @CurrentUser() user: any,

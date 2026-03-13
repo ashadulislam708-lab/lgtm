@@ -19,7 +19,9 @@ export class PaymentService {
     /**
      * Enqueue a payment processing job
      */
-    async processPayment(orderId: string): Promise<{ jobId: string; message: string }> {
+    async processPayment(
+        orderId: string,
+    ): Promise<{ jobId: string; message: string }> {
         const order = await this.orderRepository.findById(orderId);
         if (!order) {
             throw new NotFoundException(
@@ -55,7 +57,8 @@ export class PaymentService {
             );
         }
 
-        const latestPayment = await this.paymentRepository.getLatestByOrderId(orderId);
+        const latestPayment =
+            await this.paymentRepository.getLatestByOrderId(orderId);
 
         return {
             orderId,

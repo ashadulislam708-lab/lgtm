@@ -36,13 +36,18 @@ export class ReportService {
     }> {
         const dateFrom = new Date(dto.dateFrom);
         const dateTo = new Date(dto.dateTo);
-        const diffDays = (dateTo.getTime() - dateFrom.getTime()) / (1000 * 60 * 60 * 24);
+        const diffDays =
+            (dateTo.getTime() - dateFrom.getTime()) / (1000 * 60 * 60 * 24);
 
         const jobId = uuidv4();
 
         if (diffDays < 7) {
             // Generate inline with intentional delay
-            const data = await this.generateReportByType(dto.type, dateFrom, dateTo);
+            const data = await this.generateReportByType(
+                dto.type,
+                dateFrom,
+                dateTo,
+            );
 
             this.reportStore.set(jobId, {
                 status: 'completed',
@@ -54,7 +59,9 @@ export class ReportService {
                 jobId,
                 status: 'completed',
                 data,
-                message: this.i18nHelper.t('translation.reports.success.generated'),
+                message: this.i18nHelper.t(
+                    'translation.reports.success.generated',
+                ),
             };
         }
 
@@ -91,12 +98,20 @@ export class ReportService {
                 status: stored.status,
                 data: stored.data,
                 generatedAt: stored.generatedAt,
-                message: this.i18nHelper.t('translation.reports.success.retrieved'),
+                message: this.i18nHelper.t(
+                    'translation.reports.success.retrieved',
+                ),
             };
         }
 
         // Check BullMQ job status
-        const jobs = await this.reportQueue.getJobs(['active', 'waiting', 'delayed', 'completed', 'failed']);
+        const jobs = await this.reportQueue.getJobs([
+            'active',
+            'waiting',
+            'delayed',
+            'completed',
+            'failed',
+        ]);
         const job = jobs.find((j) => j.data?.jobId === jobId);
 
         if (job) {
@@ -107,7 +122,9 @@ export class ReportService {
                     jobId,
                     status: 'completed',
                     data: job.returnvalue,
-                    message: this.i18nHelper.t('translation.reports.success.retrieved'),
+                    message: this.i18nHelper.t(
+                        'translation.reports.success.retrieved',
+                    ),
                 };
             }
 
@@ -115,14 +132,18 @@ export class ReportService {
                 return {
                     jobId,
                     status: 'failed',
-                    message: this.i18nHelper.t('translation.reports.error.generation_failed'),
+                    message: this.i18nHelper.t(
+                        'translation.reports.error.generation_failed',
+                    ),
                 };
             }
 
             return {
                 jobId,
                 status: 'processing',
-                message: this.i18nHelper.t('translation.reports.success.enqueued'),
+                message: this.i18nHelper.t(
+                    'translation.reports.success.enqueued',
+                ),
             };
         }
 
@@ -145,7 +166,11 @@ export class ReportService {
     /**
      * Generate report by type with intentional delay for observability testing
      */
-    async generateReportByType(type: ReportTypeEnum, dateFrom: Date, dateTo: Date): Promise<any> {
+    async generateReportByType(
+        type: ReportTypeEnum,
+        dateFrom: Date,
+        dateTo: Date,
+    ): Promise<any> {
         // Intentional delay: 2-5 seconds for observability testing
         await new Promise((r) => setTimeout(r, 2000 + Math.random() * 3000));
 
@@ -166,7 +191,10 @@ export class ReportService {
     /**
      * Sales Report: Order + Payment aggregation
      */
-    private async generateSalesReport(dateFrom: Date, dateTo: Date): Promise<any> {
+    private async generateSalesReport(
+        dateFrom: Date,
+        dateTo: Date,
+    ): Promise<any> {
         const orderStats = await this.dataSource
             .createQueryBuilder()
             .select('COUNT(*)', 'totalOrders')
@@ -206,18 +234,28 @@ export class ReportService {
             .getRawOne();
 
         const totalPayments = parseInt(paymentStats?.totalPayments || '0', 10);
-        const successfulPayments = parseInt(paymentStats?.successfulPayments || '0', 10);
+        const successfulPayments = parseInt(
+            paymentStats?.successfulPayments || '0',
+            10,
+        );
 
         return {
             reportType: 'sales',
             dateRange: { from: dateFrom, to: dateTo },
             totalRevenue: parseFloat(orderStats?.totalRevenue || '0'),
             totalOrders: parseInt(orderStats?.totalOrders || '0', 10),
-            avgOrderValue: parseFloat(parseFloat(orderStats?.avgOrderValue || '0').toFixed(2)),
+            avgOrderValue: parseFloat(
+                parseFloat(orderStats?.avgOrderValue || '0').toFixed(2),
+            ),
             ordersByStatus,
-            paymentSuccessRate: totalPayments > 0
-                ? parseFloat(((successfulPayments / totalPayments) * 100).toFixed(2))
-                : 0,
+            paymentSuccessRate:
+                totalPayments > 0
+                    ? parseFloat(
+                          ((successfulPayments / totalPayments) * 100).toFixed(
+                              2,
+                          ),
+                      )
+                    : 0,
             totalPayments,
             successfulPayments,
             failedPayments: parseInt(paymentStats?.failedPayments || '0', 10),
@@ -227,7 +265,10 @@ export class ReportService {
     /**
      * Orders Report: Status distribution, trends, top products
      */
-    private async generateOrdersReport(dateFrom: Date, dateTo: Date): Promise<any> {
+    private async generateOrdersReport(
+        dateFrom: Date,
+        dateTo: Date,
+    ): Promise<any> {
         const statusDistribution = await this.dataSource
             .createQueryBuilder()
             .select('o.status', 'status')
@@ -279,7 +320,9 @@ export class ReportService {
             dateRange: { from: dateFrom, to: dateTo },
             statusDistribution,
             dailyTrend,
-            avgOrderValue: parseFloat(parseFloat(avgOrderValue?.avgValue || '0').toFixed(2)),
+            avgOrderValue: parseFloat(
+                parseFloat(avgOrderValue?.avgValue || '0').toFixed(2),
+            ),
             topProducts,
         };
     }
@@ -287,7 +330,10 @@ export class ReportService {
     /**
      * Inventory Report: Stock levels, low stock alerts, sync history
      */
-    private async generateInventoryReport(dateFrom: Date, dateTo: Date): Promise<any> {
+    private async generateInventoryReport(
+        dateFrom: Date,
+        dateTo: Date,
+    ): Promise<any> {
         const stockLevels = await this.dataSource
             .createQueryBuilder()
             .select('p.id', 'productId')
@@ -310,7 +356,10 @@ export class ReportService {
             .addSelect('il.source', 'source')
             .addSelect('COUNT(*)', 'itemsAffected')
             .addSelect('MIN(il.created_at)', 'syncDate')
-            .addSelect('SUM(ABS(COALESCE(il.discrepancy, 0)))', 'totalDiscrepancy')
+            .addSelect(
+                'SUM(ABS(COALESCE(il.discrepancy, 0)))',
+                'totalDiscrepancy',
+            )
             .from('inventory_logs', 'il')
             .where('il.created_at >= :dateFrom', { dateFrom })
             .andWhere('il.created_at <= :dateTo', { dateTo })

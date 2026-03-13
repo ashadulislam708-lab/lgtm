@@ -36,7 +36,9 @@ async function clearAllTables(dataSource: DataSource): Promise<void> {
                 await queryRunner.query(`TRUNCATE TABLE "${table}" CASCADE`);
                 console.log(`  Cleared table: ${table}`);
             } catch (error) {
-                console.log(`  Table ${table} does not exist or could not be cleared, skipping...`);
+                console.log(
+                    `  Table ${table} does not exist or could not be cleared, skipping...`,
+                );
             }
         }
 
@@ -94,7 +96,9 @@ async function runSeeder() {
     await seedInventoryLogs(dataSource, products);
 
     console.log('\n=== Seed Summary ===');
-    console.log(`  Users:          ${users.length} (2 test + 3 admins + 50 customers)`);
+    console.log(
+        `  Users:          ${users.length} (2 test + 3 admins + 50 customers)`,
+    );
     console.log(`  Products:       ${products.length} (3 test + 150 random)`);
     console.log(`  Features:       ${features.length} (5 test + 45 random)`);
     console.log(`  Orders:         ${orders.length} (4 test + 1500 random)`);
