@@ -39,6 +39,34 @@ export async function seedUsers(dataSource: DataSource): Promise<User[]> {
     const hashedPassword = await bcrypt.hash('Password123!', 10);
     const users: Partial<User>[] = [];
 
+    // 2 Deterministic test accounts (for API testing)
+    users.push(
+        {
+            email: 'test-admin@orderflow.com',
+            password: hashedPassword,
+            fullName: 'Test Admin',
+            firstName: 'Test',
+            lastName: 'Admin',
+            role: RolesEnum.ADMIN,
+            isActive: ActiveStatusEnum.ACTIVE,
+            emailVerified: true,
+            isVerified: true,
+            createdAt: new Date('2025-01-01'),
+        },
+        {
+            email: 'test-customer@orderflow.com',
+            password: hashedPassword,
+            fullName: 'Test Customer',
+            firstName: 'Test',
+            lastName: 'Customer',
+            role: RolesEnum.USER,
+            isActive: ActiveStatusEnum.ACTIVE,
+            emailVerified: true,
+            isVerified: true,
+            createdAt: new Date('2025-01-15'),
+        },
+    );
+
     // 3 Admin users
     const adminEmails = ['admin@orderflow.com', 'admin2@orderflow.com', 'admin3@orderflow.com'];
     const adminNames = ['Admin User', 'Admin Manager', 'Admin Supervisor'];
@@ -84,6 +112,6 @@ export async function seedUsers(dataSource: DataSource): Promise<User[]> {
         savedUsers.push(...saved);
     }
 
-    console.log(`Created ${savedUsers.length} users (3 admins + 50 customers)`);
+    console.log(`Created ${savedUsers.length} users (2 test accounts + 3 admins + 50 customers)`);
     return savedUsers;
 }

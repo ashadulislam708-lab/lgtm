@@ -669,53 +669,139 @@ fi
 
 ## Step 6: Generate docker-compose.yml
 
-Create root `docker-compose.yml` based on selected services:
+Generate a production-ready `docker-compose.yml` using modular templates with automatic port allocation.
 
-```yaml
-version: '3.8'
+### 6.1 Port Allocation (live scan)
+
+Scan running services and containers to find conflict-free ports. No registry file needed.
+
+```bash
+# Base ports
+if [ "$BACKEND" = "nestjs" ]; then
+  BASE_BACKEND=3000
+elif [ "$BACKEND" = "django" ]; then
+  BASE_BACKEND=8000
+fi
+BASE_POSTGRES=5432
+BASE_REDIS=6379
+BASE_FRONTEND=5173
+BASE_DASHBOARD=5174
+
+# Find conflict-free offset (live scan only, no registry file)
+PORT_OFFSET=0
+ATTEMPTS=0
+while [ $ATTEMPTS -lt 10 ]; do
+  CONFLICT=false
+  for BASE in $BASE_BACKEND $BASE_POSTGRES $BASE_REDIS $BASE_FRONTEND $BASE_DASHBOARD; do
+    CANDIDATE=$((BASE + PORT_OFFSET))
+    # Check system ports
+    if ss -tlnp 2>/dev/null | grep -q ":${CANDIDATE} "; then
+      CONFLICT=true
+      break
+    fi
+    # Check running docker containers
+    if docker ps --format '{{.Ports}}' 2>/dev/null | grep -q "${CANDIDATE}->"; then
+      CONFLICT=true
+      break
+    fi
+  done
+
+  if [ "$CONFLICT" = false ]; then
+    break
+  fi
+  PORT_OFFSET=$((PORT_OFFSET + 100))
+  ATTEMPTS=$((ATTEMPTS + 1))
+done
+
+# Calculate actual ports
+BACKEND_PORT=$((BASE_BACKEND + PORT_OFFSET))
+POSTGRES_PORT=$((BASE_POSTGRES + PORT_OFFSET))
+REDIS_PORT=$((BASE_REDIS + PORT_OFFSET))
+FRONTEND_PORT=$((BASE_FRONTEND + PORT_OFFSET))
+DASHBOARD_BASE_PORT=$((BASE_DASHBOARD + PORT_OFFSET))
+
+echo "Port allocation: offset=$PORT_OFFSET (Backend:$BACKEND_PORT, PostgreSQL:$POSTGRES_PORT, Redis:$REDIS_PORT, Frontend:$FRONTEND_PORT)"
+```
+
+### 6.2 Select and assemble templates
+
+Read modular templates from `.claude/templates/docker/` based on tech stack selection:
+
+```bash
+TEMPLATES_DIR=".claude/templates/docker"
+SERVICES=""
+VOLUMES=""
+
+# Auto-detect infrastructure based on backend
+if [ "$BACKEND" = "nestjs" ]; then
+  # Backend
+  TEMPLATE=$(cat "$TEMPLATES_DIR/backend-nestjs.yml" | grep -v '^# META:')
+  SERVICES="${SERVICES}${TEMPLATE}\n"
+  # PostgreSQL (auto-included for NestJS/TypeORM)
+  TEMPLATE=$(cat "$TEMPLATES_DIR/postgres.yml" | grep -v '^# META:')
+  SERVICES="${SERVICES}\n${TEMPLATE}\n"
+  VOLUMES="${VOLUMES}  postgres-data:\n"
+  # Redis (auto-included for NestJS/BullMQ)
+  TEMPLATE=$(cat "$TEMPLATES_DIR/redis.yml" | grep -v '^# META:')
+  SERVICES="${SERVICES}\n${TEMPLATE}\n"
+  VOLUMES="${VOLUMES}  redis-data:\n"
+elif [ "$BACKEND" = "django" ]; then
+  # Backend
+  TEMPLATE=$(cat "$TEMPLATES_DIR/backend-django.yml" | grep -v '^# META:')
+  SERVICES="${SERVICES}${TEMPLATE}\n"
+  # PostgreSQL (auto-included for Django ORM)
+  TEMPLATE=$(cat "$TEMPLATES_DIR/postgres.yml" | grep -v '^# META:')
+  SERVICES="${SERVICES}\n${TEMPLATE}\n"
+  VOLUMES="${VOLUMES}  postgres-data:\n"
+  # Redis (auto-included for Django/Celery)
+  TEMPLATE=$(cat "$TEMPLATES_DIR/redis.yml" | grep -v '^# META:')
+  SERVICES="${SERVICES}\n${TEMPLATE}\n"
+  VOLUMES="${VOLUMES}  redis-data:\n"
+fi
+
+# Frontend
+if [[ " ${FRONTENDS[@]} " =~ " react " ]]; then
+  TEMPLATE=$(cat "$TEMPLATES_DIR/frontend.yml" | grep -v '^# META:')
+  SERVICES="${SERVICES}\n${TEMPLATE}\n"
+fi
+
+# Dashboard
+if [ "$CREATE_DASHBOARD" = true ]; then
+  if [ "$DASHBOARD_STRATEGY" = "separate" ]; then
+    DASH_PORT=$DASHBOARD_BASE_PORT
+    for ROLE in "${DETECTED_ROLES[@]}"; do
+      TEMPLATE=$(cat "$TEMPLATES_DIR/dashboard.yml" | grep -v '^# META:')
+      TEMPLATE=$(echo "$TEMPLATE" | sed "s/\\\$DASHBOARD_NAME/dashboard-${ROLE}/g")
+      TEMPLATE=$(echo "$TEMPLATE" | sed "s/\\\$DASHBOARD_PORT/${DASH_PORT}/g")
+      SERVICES="${SERVICES}\n${TEMPLATE}\n"
+      DASH_PORT=$((DASH_PORT + 1))
+    done
+  else
+    TEMPLATE=$(cat "$TEMPLATES_DIR/dashboard.yml" | grep -v '^# META:')
+    TEMPLATE=$(echo "$TEMPLATE" | sed "s/\\\$DASHBOARD_NAME/dashboard/g")
+    TEMPLATE=$(echo "$TEMPLATE" | sed "s/\\\$DASHBOARD_PORT/${DASHBOARD_BASE_PORT}/g")
+    SERVICES="${SERVICES}\n${TEMPLATE}\n"
+  fi
+fi
+```
+
+### 6.3 Write final docker-compose.yml
+
+```bash
+cat > docker-compose.yml << COMPOSE
+# Ports: Backend=$BACKEND_PORT | PostgreSQL=$POSTGRES_PORT | Redis=$REDIS_PORT | Frontend=$FRONTEND_PORT
 
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: $PROJECT_NAME-backend
-    restart: unless-stopped
-    ports:
-      - '3000:3000'  # NestJS
-      # - '8000:8000'  # Django
-    environment:
-      - NODE_ENV=${NODE_ENV:-development}
-    networks:
-      - $PROJECT_NAME-network
+$(echo -e "$SERVICES" | sed "s/\\\$PROJECT_NAME/${PROJECT_NAME}/g" | sed "s/\\\$BACKEND_PORT/${BACKEND_PORT}/g" | sed "s/\\\$POSTGRES_PORT/${POSTGRES_PORT}/g" | sed "s/\\\$REDIS_PORT/${REDIS_PORT}/g" | sed "s/\\\$FRONTEND_PORT/${FRONTEND_PORT}/g")
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: $PROJECT_NAME-frontend
-    restart: unless-stopped
-    ports:
-      - '5173:5173'
-    networks:
-      - $PROJECT_NAME-network
-
-  dashboard:
-    build:
-      context: ./dashboard
-      dockerfile: Dockerfile
-    container_name: $PROJECT_NAME-dashboard
-    restart: unless-stopped
-    ports:
-      - '5174:5173'
-    networks:
-      - $PROJECT_NAME-network
-    # Serves all privileged roles via role-based routing (/admin/*, /ops/*, /organizer/*)
-    # If DASHBOARD_STRATEGY="separate", generate dashboard-{role} services with incrementing ports (5174, 5175, 5176...)
+$(if [ -n "$VOLUMES" ]; then echo "volumes:"; echo -e "$VOLUMES"; fi)
 
 networks:
-  $PROJECT_NAME-network:
+  ${PROJECT_NAME}-network:
     driver: bridge
+COMPOSE
+
+echo "✓ Generated docker-compose.yml with $(grep -c '^\s\s\w' docker-compose.yml) services"
 ```
 
 ## Step 7: Create Project Documentation Structure

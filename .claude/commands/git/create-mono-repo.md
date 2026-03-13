@@ -176,41 +176,37 @@ This ensures the mono-repo has a single unified git history.
 
 ## Step 6: Generate Root docker-compose.yml
 
-Unless `$ARGUMENTS` contains "skip-docker", create a `docker-compose.yml` file at the root.
+Unless `$ARGUMENTS` contains "skip-docker", create a `docker-compose.yml` file at the root using modular templates from `.claude/templates/docker/`.
 
-**Template structure:**
+### 6.1 Port Allocation
 
-```yaml
-version: '3.8'
+Use live port scan to find conflict-free ports (same approach as `/new-project` Step 6.1):
+- Scan system ports via `ss -tlnp` and running containers via `docker ps`
+- Start from base ports, increment offset by 100 if conflicts found (max 10 attempts)
+- No registry file needed - ports are determined at generation time
 
-services:
-  # Service for each cloned repository
-  <folder-name>:
-    build:
-      context: ./<folder>
-      dockerfile: Dockerfile
-    container_name: <folder-name>
-    restart: unless-stopped
-    ports:
-      - '<port>:<internal-port>'
-    environment:
-      - NODE_ENV=${NODE_ENV:-development}
-    volumes:
-      - ./<folder>:/app
-    networks:
-      - mono-network
+### 6.2 Select Templates
 
-networks:
-  mono-network:
-    driver: bridge
-```
+**Quick Start path** (when backend type is detected):
 
-**Port assignment:**
-- Backend (NestJS): 3000
-- Backend (Django): 8000
-- Frontend: 5173
-- Dashboard (frontend-dashboard): 5174
-- Mobile: (no port needed for dev)
+| Detection | Templates Included |
+|-----------|-------------------|
+| NestJS backend folder | `backend-nestjs.yml` + `postgres.yml` + `redis.yml` |
+| Django backend folder | `backend-django.yml` + `postgres.yml` + `redis.yml` |
+| Frontend folder | `frontend.yml` |
+| Dashboard folder | `dashboard.yml` |
+
+**Custom Repos path** (arbitrary repositories):
+- Generate a generic service block per folder (no infrastructure auto-detection)
+- Use basic template: build context, container name, restart policy, network
+
+### 6.3 Assemble and Write
+
+Same assembly logic as `/new-project` Step 6.2-6.3:
+- Read selected templates from `.claude/templates/docker/`
+- Strip `# META:` headers, collect volumes
+- Replace placeholders: `$PROJECT_NAME`, `$BACKEND_PORT`, `$POSTGRES_PORT`, `$REDIS_PORT`, `$FRONTEND_PORT`
+- Write `docker-compose.yml` with port comment header, services, volumes, and networks
 
 ## Step 7: Initialize Git (if needed)
 

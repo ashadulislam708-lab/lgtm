@@ -137,6 +137,38 @@ export async function seedProducts(dataSource: DataSource): Promise<Product[]> {
     console.log('Seeding products...');
 
     const products: Partial<Product>[] = [];
+
+    // 3 Deterministic test products (for API testing)
+    products.push(
+        {
+            name: 'Test Widget Alpha',
+            description: 'Deterministic test product for API testing. Category: Electronics.',
+            price: 25.00,
+            category: 'Electronics',
+            sku: 'TEST-PROD-001',
+            stockQuantity: 100,
+            isActive: true,
+        },
+        {
+            name: 'Test Widget Beta',
+            description: 'Deterministic test product for API testing. Category: Clothing.',
+            price: 75.00,
+            category: 'Clothing',
+            sku: 'TEST-PROD-002',
+            stockQuantity: 50,
+            isActive: true,
+        },
+        {
+            name: 'Test Widget Gamma',
+            description: 'Deterministic test product for API testing. Category: Books.',
+            price: 15.00,
+            category: 'Books',
+            sku: 'TEST-PROD-003',
+            stockQuantity: 200,
+            isActive: true,
+        },
+    );
+
     let skuCounter = 1;
 
     for (const category of CATEGORIES) {
