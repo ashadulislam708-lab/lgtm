@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BullModule } from '@nestjs/bullmq';
-import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
 import { QueueModule } from '@infrastructure/queue/queue.module';
 import { I18nHelper } from '@core/utils/i18n.helper';
 import { Notification } from './entities/notification.entity';

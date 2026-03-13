@@ -209,7 +209,7 @@ export class OrderService extends BaseService<Order> {
         id: string,
         dto: UpdateOrderStatusDto,
     ): Promise<Order> {
-        const order = await this.findByIdOrFail(id);
+        await this.findByIdOrFail(id);
         await this.orderRepository.update(id, { status: dto.status } as any);
         const updated = await this.orderRepository.findWithItems(id);
         return updated!;

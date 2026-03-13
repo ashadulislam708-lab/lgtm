@@ -1,8 +1,4 @@
-import {
-    Injectable,
-    ConflictException,
-    BadRequestException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { BaseService } from '@core/base';
 import { I18nHelper } from '@core/utils/i18n.helper';
 import { Product } from '../entities/product.entity';
