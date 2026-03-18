@@ -17,6 +17,16 @@ exporters:
     tls:
       insecure: true
 
+  prometheusremotewrite:
+    endpoint: http://mimir:9009/api/v1/push
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
   debug:
     verbosity: detailed
     sampling_initial: 5
@@ -28,3 +38,11 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlphttp/loki, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheusremotewrite, debug]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/tempo, debug]

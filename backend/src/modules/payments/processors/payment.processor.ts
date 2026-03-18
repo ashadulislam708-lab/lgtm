@@ -9,6 +9,7 @@ import { Payment } from '../entities/payment.entity';
 import { Order } from '@modules/orders/entities/order.entity';
 import { PaymentStatusEnum } from '@shared/enums/payment-status.enum';
 import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
+import { MetricsService } from '@infrastructure/telemetry/metrics.service';
 
 interface PaymentJobData {
     orderId: string;
@@ -26,6 +27,7 @@ export class PaymentProcessor extends WorkerHost {
         private readonly dataSource: DataSource,
         @InjectQueue(QUEUE_NAMES.NOTIFICATION)
         private readonly notificationQueue: Queue,
+        private readonly metricsService: MetricsService,
     ) {
         super();
     }
@@ -33,6 +35,12 @@ export class PaymentProcessor extends WorkerHost {
     async process(job: Job<PaymentJobData>): Promise<void> {
         const { orderId, amount, correlationId } = job.data;
         const attemptNumber = job.attemptsMade + 1;
+        const jobStartTime = Date.now();
+
+        this.metricsService.paymentAttemptsTotal.add(1);
+        this.metricsService.queueJobsActive.add(1, {
+            'queue.name': 'payment-processing',
+        });
 
         this.logger.log(
             `Processing payment for order ${orderId}, attempt ${attemptNumber}, correlationId: ${correlationId}`,
@@ -111,6 +119,17 @@ export class PaymentProcessor extends WorkerHost {
                     metadata: { orderId, amount, correlationId },
                 });
 
+                this.metricsService.paymentSuccessTotal.add(1);
+                this.metricsService.paymentDuration.record(
+                    result.processingTime,
+                );
+                this.metricsService.queueJobsActive.add(-1, {
+                    'queue.name': 'payment-processing',
+                });
+                this.metricsService.queueJobsCompleted.add(1, {
+                    'queue.name': 'payment-processing',
+                });
+
                 this.logger.log(`Payment succeeded for order ${orderId}`);
             } else {
                 // Payment failed (gateway declined)
@@ -143,6 +162,19 @@ export class PaymentProcessor extends WorkerHost {
                     },
                 });
 
+                this.metricsService.paymentFailureTotal.add(1, {
+                    'error.code': result.errorCode || 'DECLINED',
+                });
+                this.metricsService.paymentDuration.record(
+                    result.processingTime,
+                );
+                this.metricsService.queueJobsActive.add(-1, {
+                    'queue.name': 'payment-processing',
+                });
+                this.metricsService.queueJobsFailed.add(1, {
+                    'queue.name': 'payment-processing',
+                });
+
                 this.logger.warn(
                     `Payment failed for order ${orderId}: ${result.message}`,
                 );
@@ -167,6 +199,19 @@ export class PaymentProcessor extends WorkerHost {
                 await this.dataSource.manager.update(Order, orderId, {
                     paymentAttempts: () => 'payment_attempts + 1',
                 } as any);
+
+                this.metricsService.paymentFailureTotal.add(1, {
+                    'error.code': 'TIMEOUT',
+                });
+                this.metricsService.paymentDuration.record(
+                    Date.now() - jobStartTime,
+                );
+                this.metricsService.queueJobsActive.add(-1, {
+                    'queue.name': 'payment-processing',
+                });
+                this.metricsService.queueJobsFailed.add(1, {
+                    'queue.name': 'payment-processing',
+                });
 
                 this.logger.warn(
                     `Payment timed out for order ${orderId}, attempt ${attemptNumber}`,

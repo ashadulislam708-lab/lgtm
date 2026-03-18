@@ -1,4 +1,5 @@
 import { createLogger, format, transports } from 'winston';
+import { OpenTelemetryTransportV3 } from '@opentelemetry/winston-transport';
 import { existsSync, mkdirSync } from 'fs';
 import { getCorrelationId } from './correlation.storage';
 
@@ -62,6 +63,9 @@ const loggerInstance = createLogger({
                       format: structuredFormat,
                   }),
               ]),
+        ...(process.env.OTEL_EXPORTER_OTLP_ENDPOINT
+            ? [new OpenTelemetryTransportV3()]
+            : []),
     ],
 });
 

@@ -7,18 +7,36 @@ export class UpdateUsersTable1762192832397 implements MigrationInterface {
         await queryRunner.query(
             `ALTER TABLE IF EXISTS "products" DROP CONSTRAINT IF EXISTS "FK_products_category"`,
         );
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_users_email"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_users_role"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_users_is_active"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_categories_slug"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_categories_name"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_name"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_slug"`);
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_price"`);
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_users_email"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_users_role"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_users_is_active"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_categories_slug"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_categories_name"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_products_name"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_products_slug"`,
+        );
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_products_price"`,
+        );
         await queryRunner.query(
             `DROP INDEX IF EXISTS "public"."IDX_products_is_featured"`,
         );
-        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_is_active"`);
+        await queryRunner.query(
+            `DROP INDEX IF EXISTS "public"."IDX_products_is_active"`,
+        );
         await queryRunner.query(
             `DROP INDEX IF EXISTS "public"."IDX_products_category_id"`,
         );

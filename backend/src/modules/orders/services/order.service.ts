@@ -21,6 +21,7 @@ import { OrderStatusEnum } from '@shared/enums/order-status.enum';
 import { RolesEnum } from '@shared/enums/role.enum';
 import { PaymentStatusEnum } from '@shared/enums/payment-status.enum';
 import { QUEUE_NAMES } from '@infrastructure/queue/queue.constants';
+import { MetricsService } from '@infrastructure/telemetry/metrics.service';
 import { Product } from '@modules/products/entities/product.entity';
 
 @Injectable()
@@ -35,6 +36,7 @@ export class OrderService extends BaseService<Order> {
         private readonly paymentQueue: Queue,
         @InjectQueue(QUEUE_NAMES.NOTIFICATION)
         private readonly notificationQueue: Queue,
+        private readonly metricsService: MetricsService,
     ) {
         super(orderRepository, 'Order');
     }
@@ -132,6 +134,12 @@ export class OrderService extends BaseService<Order> {
             }
 
             await queryRunner.commitTransaction();
+
+            // Record order metrics
+            this.metricsService.ordersCreatedTotal.add(1, {
+                'order.status': OrderStatusEnum.PENDING,
+            });
+            this.metricsService.orderAmountHistogram.record(totalAmount);
         } catch (error) {
             await queryRunner.rollbackTransaction();
             throw error;
@@ -211,6 +219,11 @@ export class OrderService extends BaseService<Order> {
     ): Promise<Order> {
         await this.findByIdOrFail(id);
         await this.orderRepository.update(id, { status: dto.status } as any);
+
+        this.metricsService.ordersByStatusTotal.add(1, {
+            'order.status': dto.status,
+        });
+
         const updated = await this.orderRepository.findWithItems(id);
         return updated!;
     }
