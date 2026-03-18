@@ -29,13 +29,13 @@ const devConsoleFormat = format.combine(
     format.errors({ stack: true }),
     correlationIdFormat(),
     format.colorize(),
-    format.printf(
-        ({ timestamp, level, message, context, correlationId }) => {
-            const ctx = context ? `[${context}]` : '';
-            const cid = correlationId ? `[${correlationId}]` : '';
-            return `${timestamp} ${level} ${ctx}${cid} ${message}`;
-        },
-    ),
+    format.printf((info) => {
+        const ctx = info['context'] ? `[${info['context'] as string}]` : '';
+        const cid = info['correlationId']
+            ? `[${info['correlationId'] as string}]`
+            : '';
+        return `${info.timestamp} ${info.level} ${ctx}${cid} ${info.message}`;
+    }),
 );
 
 const loggerInstance = createLogger({
