@@ -12,6 +12,8 @@ import {
     AllExceptionsFilter,
 } from './core/filters/http-exception.filter';
 import { TransformInterceptor } from './core/interceptors/transform.interceptor';
+import { MetricsInterceptor } from './core/interceptors/metrics.interceptor';
+import { MetricsService } from './infrastructure/telemetry/metrics.service';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -23,8 +25,12 @@ async function bootstrap() {
 
     app.useGlobalFilters(new AllExceptionsFilter(), new HttpExceptionFilter());
 
-    // Global Transform Interceptor - wraps all responses in ResponsePayloadDto
-    app.useGlobalInterceptors(new TransformInterceptor());
+    // Global Interceptors
+    const metricsService = app.get(MetricsService);
+    app.useGlobalInterceptors(
+        new TransformInterceptor(),
+        new MetricsInterceptor(metricsService),
+    );
 
     // Add API prefix - all routes will be /api/*
     app.setGlobalPrefix('api', {

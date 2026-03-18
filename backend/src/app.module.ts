@@ -27,6 +27,7 @@ import { InventoryModule } from './modules/inventory';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { TelemetryModule } from '@infrastructure/telemetry';
 
 import { LanguageEnum } from '@shared/enums';
 
@@ -83,6 +84,7 @@ import { LanguageEnum } from '@shared/enums';
             },
         }),
         PassportModule.register({ defaultStrategy: 'jwt' }),
+        TelemetryModule,
         UserModule,
         AuthModule,
         OtpModule,
