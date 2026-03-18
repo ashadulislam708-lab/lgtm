@@ -12,6 +12,8 @@ services:
     environment:
       - POSTGRES_HOST=postgres
       - REDIS_HOST=redis
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=lgtm-backend
     volumes:
       - ./backend/src:/app/src
     depends_on:
@@ -19,6 +21,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     networks:
       - lgtm-network
 
@@ -58,9 +62,65 @@ services:
     networks:
       - lgtm-network
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.120.0
+    container_name: lgtm-otel-collector
+    restart: unless-stopped
+    command: ['--config=/etc/otel-collector-config.yml']
+    ports:
+      - '4317:4317'
+      - '4318:4318'
+    volumes:
+      - ./infra/otel-collector/otel-collector-config.yml:/etc/otel-collector-config.yml:ro
+    depends_on:
+      - loki
+    networks:
+      - lgtm-network
+
+  loki:
+    image: grafana/loki:3.4.2
+    container_name: lgtm-loki
+    restart: unless-stopped
+    user: '0'
+    ports:
+      - '3100:3100'
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./infra/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data:/loki/data
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lgtm-network
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: lgtm-grafana
+    restart: unless-stopped
+    ports:
+      - '3001:3000'
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      loki:
+        condition: service_healthy
+    networks:
+      - lgtm-network
+
 volumes:
   postgres-data:
   redis-data:
+  loki-data:
+  grafana-data:
 
 networks:
   lgtm-network:

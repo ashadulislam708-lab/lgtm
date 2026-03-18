@@ -5,25 +5,25 @@ export class UpdateUsersTable1762192832397 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
-            `ALTER TABLE "products" DROP CONSTRAINT "FK_products_category"`,
+            `ALTER TABLE IF EXISTS "products" DROP CONSTRAINT IF EXISTS "FK_products_category"`,
         );
-        await queryRunner.query(`DROP INDEX "public"."IDX_users_email"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_users_role"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_users_is_active"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_categories_slug"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_categories_name"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_products_name"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_products_slug"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_products_price"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_users_email"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_users_role"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_users_is_active"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_categories_slug"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_categories_name"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_name"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_slug"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_price"`);
         await queryRunner.query(
-            `DROP INDEX "public"."IDX_products_is_featured"`,
+            `DROP INDEX IF EXISTS "public"."IDX_products_is_featured"`,
         );
-        await queryRunner.query(`DROP INDEX "public"."IDX_products_is_active"`);
+        await queryRunner.query(`DROP INDEX IF EXISTS "public"."IDX_products_is_active"`);
         await queryRunner.query(
-            `DROP INDEX "public"."IDX_products_category_id"`,
+            `DROP INDEX IF EXISTS "public"."IDX_products_category_id"`,
         );
         await queryRunner.query(
-            `DROP INDEX "public"."IDX_products_stock_quantity"`,
+            `DROP INDEX IF EXISTS "public"."IDX_products_stock_quantity"`,
         );
         await queryRunner.query(
             `CREATE TABLE "otp" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "email" character varying NOT NULL, "otp" integer NOT NULL, "expires_at" TIMESTAMP, CONSTRAINT "UQ_463cf01e0ea83ad57391fd4e1d7" UNIQUE ("email"), CONSTRAINT "PK_32556d9d7b22031d7d0e1fd6723" PRIMARY KEY ("id"))`,
@@ -104,39 +104,60 @@ export class UpdateUsersTable1762192832397 implements MigrationInterface {
         await queryRunner.query(
             `ALTER TABLE "users" ADD "is_active" "public"."users_is_active_enum" NOT NULL DEFAULT '1'`,
         );
-        await queryRunner.query(
-            `ALTER TABLE "categories" ALTER COLUMN "created_at" SET DEFAULT now()`,
+        // Only alter categories/products if they exist (they may not exist on fresh DB)
+        const categoriesExist = await queryRunner.query(
+            `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'categories')`,
         );
-        await queryRunner.query(
-            `ALTER TABLE "categories" ALTER COLUMN "updated_at" SET DEFAULT now()`,
+        if (categoriesExist[0].exists) {
+            await queryRunner.query(
+                `ALTER TABLE "categories" ALTER COLUMN "created_at" SET DEFAULT now()`,
+            );
+            await queryRunner.query(
+                `ALTER TABLE "categories" ALTER COLUMN "updated_at" SET DEFAULT now()`,
+            );
+        }
+        const productsExist = await queryRunner.query(
+            `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'products')`,
         );
-        await queryRunner.query(
-            `ALTER TABLE "products" ALTER COLUMN "created_at" SET DEFAULT now()`,
-        );
-        await queryRunner.query(
-            `ALTER TABLE "products" ALTER COLUMN "updated_at" SET DEFAULT now()`,
-        );
-        await queryRunner.query(
-            `ALTER TABLE "products" ADD CONSTRAINT "FK_9a5f6868c96e0069e699f33e124" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE NO ACTION`,
-        );
+        if (productsExist[0].exists) {
+            await queryRunner.query(
+                `ALTER TABLE "products" ALTER COLUMN "created_at" SET DEFAULT now()`,
+            );
+            await queryRunner.query(
+                `ALTER TABLE "products" ALTER COLUMN "updated_at" SET DEFAULT now()`,
+            );
+            await queryRunner.query(
+                `ALTER TABLE "products" ADD CONSTRAINT "FK_9a5f6868c96e0069e699f33e124" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE NO ACTION`,
+            );
+        }
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(
-            `ALTER TABLE "products" DROP CONSTRAINT "FK_9a5f6868c96e0069e699f33e124"`,
+        const productsExist = await queryRunner.query(
+            `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'products')`,
         );
-        await queryRunner.query(
-            `ALTER TABLE "products" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP`,
+        if (productsExist[0].exists) {
+            await queryRunner.query(
+                `ALTER TABLE "products" DROP CONSTRAINT "FK_9a5f6868c96e0069e699f33e124"`,
+            );
+            await queryRunner.query(
+                `ALTER TABLE "products" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP`,
+            );
+            await queryRunner.query(
+                `ALTER TABLE "products" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP`,
+            );
+        }
+        const categoriesExist = await queryRunner.query(
+            `SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'categories')`,
         );
-        await queryRunner.query(
-            `ALTER TABLE "products" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP`,
-        );
-        await queryRunner.query(
-            `ALTER TABLE "categories" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP`,
-        );
-        await queryRunner.query(
-            `ALTER TABLE "categories" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP`,
-        );
+        if (categoriesExist[0].exists) {
+            await queryRunner.query(
+                `ALTER TABLE "categories" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP`,
+            );
+            await queryRunner.query(
+                `ALTER TABLE "categories" ALTER COLUMN "created_at" SET DEFAULT CURRENT_TIMESTAMP`,
+            );
+        }
         await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "is_active"`);
         await queryRunner.query(`DROP TYPE "public"."users_is_active_enum"`);
         await queryRunner.query(
@@ -185,33 +206,37 @@ export class UpdateUsersTable1762192832397 implements MigrationInterface {
         );
         await queryRunner.query(`ALTER TABLE "users" DROP COLUMN "full_name"`);
         await queryRunner.query(`DROP TABLE "otp"`);
-        await queryRunner.query(
-            `CREATE INDEX "IDX_products_stock_quantity" ON "products" ("stock_quantity") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_products_category_id" ON "products" ("category_id") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_products_is_active" ON "products" ("is_active") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_products_is_featured" ON "products" ("is_featured") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_products_price" ON "products" ("price") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_products_slug" ON "products" ("slug") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_products_name" ON "products" ("name") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_categories_name" ON "categories" ("name") `,
-        );
-        await queryRunner.query(
-            `CREATE INDEX "IDX_categories_slug" ON "categories" ("slug") `,
-        );
+        if (productsExist[0].exists) {
+            await queryRunner.query(
+                `CREATE INDEX "IDX_products_stock_quantity" ON "products" ("stock_quantity") `,
+            );
+            await queryRunner.query(
+                `CREATE INDEX "IDX_products_category_id" ON "products" ("category_id") `,
+            );
+            await queryRunner.query(
+                `CREATE INDEX "IDX_products_is_active" ON "products" ("is_active") `,
+            );
+            await queryRunner.query(
+                `CREATE INDEX "IDX_products_is_featured" ON "products" ("is_featured") `,
+            );
+            await queryRunner.query(
+                `CREATE INDEX "IDX_products_price" ON "products" ("price") `,
+            );
+            await queryRunner.query(
+                `CREATE INDEX "IDX_products_slug" ON "products" ("slug") `,
+            );
+            await queryRunner.query(
+                `CREATE INDEX "IDX_products_name" ON "products" ("name") `,
+            );
+        }
+        if (categoriesExist[0].exists) {
+            await queryRunner.query(
+                `CREATE INDEX "IDX_categories_name" ON "categories" ("name") `,
+            );
+            await queryRunner.query(
+                `CREATE INDEX "IDX_categories_slug" ON "categories" ("slug") `,
+            );
+        }
         await queryRunner.query(
             `CREATE INDEX "IDX_users_is_active" ON "users" ("is_active") `,
         );
@@ -221,8 +246,10 @@ export class UpdateUsersTable1762192832397 implements MigrationInterface {
         await queryRunner.query(
             `CREATE INDEX "IDX_users_email" ON "users" ("email") `,
         );
-        await queryRunner.query(
-            `ALTER TABLE "products" ADD CONSTRAINT "FK_products_category" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE NO ACTION`,
-        );
+        if (productsExist[0].exists && categoriesExist[0].exists) {
+            await queryRunner.query(
+                `ALTER TABLE "products" ADD CONSTRAINT "FK_products_category" FOREIGN KEY ("category_id") REFERENCES "categories"("id") ON DELETE SET NULL ON UPDATE NO ACTION`,
+            );
+        }
     }
 }
