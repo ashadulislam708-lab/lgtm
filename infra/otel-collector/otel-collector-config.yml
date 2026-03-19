@@ -6,6 +6,16 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
+  hostmetrics:
+    collection_interval: 15s
+    scrapers:
+      cpu:
+      memory:
+      disk:
+      filesystem:
+      network:
+      load:
+
 processors:
   batch:
     send_batch_size: 1024
@@ -39,7 +49,7 @@ service:
       processors: [batch]
       exporters: [otlphttp/loki, debug]
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, hostmetrics]
       processors: [batch]
       exporters: [prometheusremotewrite, debug]
     traces:
