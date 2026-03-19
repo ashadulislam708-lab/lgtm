@@ -3,6 +3,7 @@ apiVersion: 1
 datasources:
   - name: Loki
     type: loki
+    uid: loki
     access: proxy
     url: http://loki:3100
     isDefault: false
@@ -17,6 +18,7 @@ datasources:
 
   - name: Mimir
     type: prometheus
+    uid: mimir
     access: proxy
     url: http://mimir:9009/prometheus
     isDefault: true
@@ -35,4 +37,27 @@ datasources:
       httpMethod: GET
       tracesToLogsV2:
         datasourceUid: loki
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
         filterByTraceID: true
+        filterBySpanID: true
+      tracesToMetrics:
+        datasourceUid: mimir
+      serviceMap:
+        datasourceUid: mimir
+      nodeGraph:
+        enabled: true
+      search:
+        filters:
+          - id: service-name
+            tag: service.name
+            operator: '='
+            scope: resource
+          - id: span-name
+            tag: name
+            operator: '='
+            scope: span
+          - id: status
+            tag: status
+            operator: '='
+            scope: intrinsic

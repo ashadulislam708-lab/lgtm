@@ -26,7 +26,9 @@ export class MetricsInterceptor implements NestInterceptor {
         return next.handle().pipe(
             tap(() => {
                 const duration = Date.now() - now;
-                const statusCode = context.switchToHttp().getResponse().statusCode;
+                const statusCode = context
+                    .switchToHttp()
+                    .getResponse().statusCode;
                 this.metricsService.httpRequestDuration.record(duration, {
                     'http.method': method,
                     'http.route': routePath,

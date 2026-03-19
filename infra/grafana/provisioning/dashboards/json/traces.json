@@ -1,0 +1,165 @@
+{
+  "uid": "traces",
+  "title": "Traces",
+  "tags": ["traces", "lgtm"],
+  "timezone": "browser",
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Trace Search — Click a row to see full request waterfall",
+      "description": "Shows all recent traces. Click any trace to expand the full span waterfall: every middleware, controller, DB query, and HTTP call.",
+      "type": "traces",
+      "gridPos": { "h": 18, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "targets": [
+        {
+          "queryType": "traceqlSearch",
+          "filters": [
+            {
+              "id": "service-name",
+              "tag": "service.name",
+              "operator": "=",
+              "value": ["lgtm-backend"],
+              "scope": "resource"
+            }
+          ],
+          "limit": 30,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Service Graph",
+      "description": "Service dependency graph with request rates between services.",
+      "type": "nodeGraph",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 18 },
+      "datasource": { "type": "tempo", "uid": "tempo" },
+      "targets": [
+        {
+          "queryType": "serviceMap",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Trace Duration Distribution",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "mimir" },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "P50",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "P95",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_duration_milliseconds_bucket[5m])) by (le))",
+          "legendFormat": "P99",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15 }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "title": "Request Rate by Route",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 },
+      "datasource": { "type": "prometheus", "uid": "mimir" },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_duration_milliseconds_count[5m])) by (http_route)",
+          "legendFormat": "{{ http_route }}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 15 }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "title": "Slowest Endpoints (P95)",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 36 },
+      "datasource": { "type": "prometheus", "uid": "mimir" },
+      "targets": [
+        {
+          "expr": "topk(10, histogram_quantile(0.95, sum(rate(http_server_duration_milliseconds_bucket[5m])) by (le, http_route)))",
+          "refId": "A",
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true },
+            "renameByName": { "http_route": "Route", "Value": "P95 Duration (ms)" }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [{ "field": "P95 Duration (ms)", "desc": true }]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": { "align": "auto" }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "P95 Duration (ms)" },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": { "type": "color-background", "mode": "gradient" }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "green", "value": null },
+                    { "color": "yellow", "value": 100 },
+                    { "color": "orange", "value": 500 },
+                    { "color": "red", "value": 1000 }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "schemaVersion": 39
+}
