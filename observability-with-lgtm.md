@@ -89,15 +89,33 @@ You need both. But monitoring alone will leave you helpless when something you d
 
 ### When Does Observability Really Matter?
 
-Honestly, if you're running a single service with a handful of users, you might get away with basic logging. But the moment your system starts looking like any of these, observability stops being optional:
+Short answer: as soon as your system is more complex than a single script running on one machine.
 
-- **Multiple services** — a request hops between 3 services and fails. Which one?
-- **Background workers** — a job silently fails at 3 AM. How do you even find out?
-- **Cloud/containers** — the container crashed and restarted. The logs are gone.
-- **High traffic** — average latency looks fine but some users are getting 5-second responses.
-- **Third-party APIs** — your payment provider is flaky. How often? What's the impact?
+But let's be honest — if you have a personal project with 10 users, basic `console.log` probably works fine. The pain hits when the system grows. Here's how to recognize the tipping point:
 
-Sound familiar? Then you need observability.
+**Scenario 1: A user reports "the checkout is broken"**
+You check your logs. You see the request hit your API. No error. But the order never went through. Where did it break? The payment service? The inventory check? The email queue? Without observability, you're grep-ing through logs across 4 services, hoping to piece together what happened. With observability, you pull up one trace and see the full picture in seconds.
+
+**Scenario 2: A background job fails silently at 3 AM**
+No alert fires. No user complains immediately. Hours later you notice thousands of emails weren't sent. You have no idea when it broke, which jobs were affected, or what the error was — because the container restarted and took the logs with it. Observability would have caught the spike in job failures the moment it started.
+
+**Scenario 3: Your API looks healthy, but users are angry**
+Average response time: 120ms. P99 response time: 8 seconds. Your averages are lying to you. A small percentage of users are hitting a slow database query, but it's buried in the noise. Metrics with proper histograms surface this immediately.
+
+---
+
+Here's a quick rule of thumb:
+
+| If your system has... | You need... |
+|---|---|
+| 1 service, <100 users | Basic logging is fine |
+| Multiple services | Distributed tracing |
+| Background workers / queues | Metrics + alerting |
+| Containers (Docker/K8s) | Centralized log aggregation |
+| External APIs / third parties | Error rate tracking |
+| Any paying users | All of the above |
+
+The bottom line: observability isn't about being fancy. It's about being able to answer *"what is broken, where, and why"* without waking up four engineers at 2 AM to find out.
 
 ---
 
@@ -159,6 +177,25 @@ Business:        payments_failed_total + 340        ← 340 payments are failing
 ```
 
 The infrastructure metric tells you there's a problem. The business metric tells you how bad it actually is. Add both.
+
+#### Checking CPU and RAM Right Now
+
+Here's what actually checking infrastructure health looks like in practice. These PromQL queries run in Grafana against Mimir:
+
+```promql
+# CPU usage % — how much of the CPU is your process consuming right now?
+rate(process_cpu_seconds_total[1m]) * 100
+
+# Memory used in MB — how much RAM is the Node process holding?
+process_resident_memory_bytes / 1024 / 1024
+
+# Host-level memory usage % — what fraction of the server's RAM is in use?
+(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+```
+
+The first two come from the OTel SDK automatically for any Node.js process. The third (`node_memory_*`) comes from the `hostmetrics` receiver in the OTel Collector — the one that scrapes the machine itself. Once that receiver is enabled, you get CPU, memory, disk, and network for free without writing a line of application code.
+
+So yes: run those three queries in Grafana and you can see exactly how your CPU and RAM are doing right now.
 
 ---
 
@@ -378,8 +415,6 @@ Here's the full data flow from your application all the way to the dashboards:
 
 The core idea here is **your application only talks to one place** — the Collector. It doesn't need to know about Loki, Mimir, or Tempo. The Collector handles the routing.
 
-That matters a lot in practice. If you later decide to swap Mimir for a hosted Prometheus, or add a second backend for compliance reasons, you just update the Collector's config. Your application doesn't change at all.
-
 ---
 
 ## OpenTelemetry: The Instrumentation Standard
@@ -395,17 +430,7 @@ What does it actually give you?
 - **Auto-instrumentation** — it can automatically patch popular libraries with zero code changes
 - **OTLP** — a standard wire protocol for sending telemetry data to any backend
 
-### The Big Idea: Instrument Once, Change Backends Freely
-
-Before OpenTelemetry, every observability vendor shipped their own SDK. If you instrumented your app with Datadog's SDK and later wanted to switch to a self-hosted stack, you'd have to rewrite all your instrumentation.
-
-With OpenTelemetry, that problem goes away:
-
-1. Instrument your app once with the OTel SDK
-2. Send data to the OTel Collector
-3. From the Collector, route to any backend — Loki, Datadog, Jaeger, whatever you want
-
-Your instrumentation is permanent. Your backend is swappable. That's a huge deal for long-term maintainability.
+**Instrument once, change backends freely.** Your instrumentation is permanent. Your backend is swappable.
 
 ### Auto-Instrumentation Is a Game Changer
 
@@ -461,53 +486,7 @@ Host Metrics ──►  Attributes   ──►  Mimir   (metrics)
 
 **Processors** sit in the middle and can transform data before it goes out. The most common is `batch`, which groups records together for efficient transmission. You can also add processors to sample traces (so you don't store every single one), redact sensitive fields like passwords, or enrich data with extra metadata.
 
-**Exporters** are how data gets out. Each backend has its own exporter configured with the right protocol.
-
-A minimal but complete Collector config looks like this:
-
-```yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-        endpoint: 0.0.0.0:4317
-      http:
-        endpoint: 0.0.0.0:4318
-
-processors:
-  batch:
-    send_batch_size: 1024
-    timeout: 2s
-
-exporters:
-  otlphttp/loki:
-    endpoint: http://loki:3100/otlp
-
-  prometheusremotewrite:
-    endpoint: http://mimir:9009/api/v1/push
-
-  otlp/tempo:
-    endpoint: tempo:4317
-
-service:
-  pipelines:
-    logs:
-      receivers:  [otlp]
-      processors: [batch]
-      exporters:  [otlphttp/loki]
-
-    metrics:
-      receivers:  [otlp]
-      processors: [batch]
-      exporters:  [prometheusremotewrite]
-
-    traces:
-      receivers:  [otlp]
-      processors: [batch]
-      exporters:  [otlp/tempo]
-```
-
-Three explicit pipelines — one per signal type. Each independently configurable. Pretty readable once you understand the structure.
+**Exporters** are how data gets out. Each backend has its own exporter configured with the right protocol — logs to Loki, metrics to Mimir, traces to Tempo.
 
 ---
 
@@ -529,35 +508,15 @@ The result? Loki is dramatically cheaper to operate than Elasticsearch, while st
 
 ### LogQL — Loki's Query Language
 
-LogQL is inspired by PromQL and feels familiar once you've used either. Here are some examples:
+LogQL lets you filter logs by labels and content. For example, to find all error logs for a specific order:
 
 ```logql
-# Show all error logs from the payment service
-{service="payment-service", level="error"}
-
-# Find logs that contain a specific order ID
-{service="payment-service"} |= "ORD-12345"
-
-# Parse JSON and filter by a specific field value
-{service="payment-service"} | json | correlationId="f47ac10b"
-
-# Count error logs per minute over time (turns logs into a metric)
-sum(rate({service="payment-service", level="error"}[1m]))
+{service="payment-service"} | json | orderId="ORD-12345"
 ```
-
-That last one is interesting — you can turn log data into metrics on the fly. Useful for things like "how many 4xx errors per minute is this service producing?"
 
 ### One Thing to Get Right: Label Cardinality
 
-Since Loki only indexes labels, your choice of labels really matters. Good labels are **low cardinality** — meaning they have a small, finite set of possible values:
-
-- `environment` → prod, dev, staging ✅
-- `service` → payment-service, order-service ✅
-- `level` → info, warn, error ✅
-- `user_id` → 1, 2, 3, ... 10 million ❌
-- `request_id` → a unique UUID per request ❌
-
-High-cardinality labels blow up Loki's index and kill performance. If you need to search by something unique like a correlation ID, put it in the log body — not as a label.
+Good labels are **low cardinality** — `service`, `level`, `environment`. Never use `user_id` or `request_id` as labels. High-cardinality labels blow up Loki's index and kill performance. If you need to search by something unique like a correlation ID, put it in the log body — not as a label.
 
 ---
 
@@ -567,13 +526,7 @@ Tempo is where your traces live. It's purpose-built for storing and querying dis
 
 ### How Tempo Stores Traces
 
-When your app (via the Collector) sends spans to Tempo:
-
-1. Spans are written to a Write-Ahead Log immediately for durability
-2. Every few minutes, they're flushed to compressed blocks on disk
-3. A background compactor periodically merges older blocks to save space
-
-The whole design is optimized for ingestion — Tempo can take in a huge volume of traces without slowing down. You can also configure how long to keep traces before they're deleted (retention).
+Tempo is optimized for ingestion — it can take in a huge volume of spans without slowing down. Traces are stored as compressed blocks on disk. You can configure retention to control how long they're kept.
 
 ### Finding a Trace
 
@@ -584,14 +537,8 @@ The simplest way: paste a trace ID. When your app includes the trace ID in its r
 What if you don't have a specific trace ID? TraceQL lets you search by the shape and attributes of traces:
 
 ```traceql
-# Find any trace where a single span took more than 2 seconds
-{ duration > 2s }
-
 # Find traces where the payment service had an error
 { span.service.name = "payment-service" && status = error }
-
-# Find traces with slow database queries
-{ span.db.system = "postgresql" && duration > 500ms }
 ```
 
 This is incredibly useful for finding the outliers — the slow requests, the error-producing requests — without knowing their trace IDs in advance.
@@ -620,25 +567,19 @@ Mimir solves all of these with a distributed architecture. The best part? It's 1
 
 ### PromQL — Querying Metrics
 
-PromQL is the query language for Prometheus-compatible metrics. It has a bit of a learning curve but it's very powerful:
+PromQL is the query language for Prometheus-compatible metrics. Once you understand the `rate()` pattern, most of what you need falls naturally into place:
 
 ```promql
-# How many requests per second, broken down by endpoint
-sum by (http_route) (rate(http_server_request_total[5m]))
-
 # 95th percentile response time
 histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_bucket[5m])))
-
-# Error rate as a percentage
-sum(rate(http_server_error_total[5m]))
-  / sum(rate(http_server_request_total[5m])) * 100
-
-# Payment failure rate
-sum(rate(business_payments_failure_total[5m]))
-  / sum(rate(business_payments_attempts_total[5m])) * 100
 ```
 
-Once you understand the `rate()` and `histogram_quantile()` patterns, most of what you'll ever need falls naturally into place.
+For infrastructure, the `hostmetrics` receiver in the OTel Collector automatically scrapes CPU, memory, disk, and network from the host — no application code needed:
+
+```promql
+# Host-level memory usage %
+(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+```
 
 ---
 
@@ -685,18 +626,6 @@ Fix: Schedule auto-vacuum for off-peak hours.
 You have graphs, traces, and logs. You have a root cause. You have a fix. Your boss is happy.
 
 No SSH. No grepping. No guessing.
-
-### Dashboards Worth Setting Up
-
-Here's a practical starting set for any backend service:
-
-| Dashboard | What to put in it |
-|-----------|------------------|
-| **HTTP Overview** | Request rate, p50/p95/p99 latency, error rate, per-route breakdown |
-| **Trace Explorer** | Trace search by service/status, service dependency graph |
-| **Log Explorer** | Log stream with label filters, error rate over time |
-| **Business Metrics** | Whatever matters to your domain — order rate, payment success %, etc. |
-| **Infrastructure** | CPU, memory, disk, network for your servers and containers |
 
 ---
 
